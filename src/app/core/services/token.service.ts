@@ -39,5 +39,30 @@ export class TokenService {
     localStorage.removeItem(this.USER_KEY);
   }
 
-  
+  // Vérifier si l'utilisateur est connecté
+  isLoggedIn(): boolean {
+    return this.getToken() !== null;
+  }
+
+  // Décoder le token JWT (simple)
+  decodeToken(token: string): any {
+    try {
+      const payload = token.split('.')[1];
+      return JSON.parse(atob(payload));
+    } catch (error) {
+      return null;
+    }
+  }
+
+  // Vérifier si le token est expiré
+  isTokenExpired(): boolean {
+    const token = this.getToken();
+    if (!token) return true;
+
+    const decoded = this.decodeToken(token);
+    if (!decoded || !decoded.exp) return true;
+
+    const expirationDate = new Date(decoded.exp * 1000);
+    return expirationDate < new Date();
+  }
 }
