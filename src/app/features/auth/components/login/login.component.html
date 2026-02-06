@@ -1,0 +1,81 @@
+<app-header></app-header>
+
+<main>
+  <section class="login-hero position-relative d-flex align-items-center">
+
+    <!-- Background -->
+    <div class="login-bg"></div>
+    <div class="overlay"></div>
+
+    <div class="container position-relative z-index-1">
+      <div class="row justify-content-center">
+        <div class="col-lg-10">
+
+          <div class="login-card-premium animate-fade-in">
+
+            <!-- LEFT SIDE TEXT -->
+            <div class="login-info">
+              <span class="section-tag">Bienvenue</span>
+              <h2>
+                Connectez-vous<br>
+                <span>et rejoignez la communauté</span>
+              </h2>
+              <p>
+                Accédez à vos habitudes, suivez vos progrès et restez motivé avec DailyHelp.
+                Une communauté, un objectif, un rythme humain.
+              </p>
+            </div>
+
+            <!-- FORM -->
+            <form class="login-form"
+                  [formGroup]="loginForm"
+                  (ngSubmit)="onSubmit()">
+
+              <h3>Connexion</h3>
+
+              <div class="form-grid">
+
+                <div class="form-group">
+                  <i class="bi bi-envelope"></i>
+                  <input type="email"
+                         placeholder="Email"
+                         formControlName="email">
+                </div>
+
+                <div class="form-group">
+                  <i class="bi bi-lock"></i>
+                  <input type="password"
+                         placeholder="Mot de passe"
+                         formControlName="password">
+                </div>
+
+              </div>
+
+              <!-- Messages -->
+              <div class="alert alert-danger" *ngIf="errorMessage">
+                {{ errorMessage }}
+              </div>
+
+              <!-- Bouton -->
+              <button class="btn-login" [disabled]="isLoading">
+                <span *ngIf="!isLoading">Se connecter</span>
+                <span *ngIf="isLoading">Connexion...</span>
+              </button>
+
+              <p class="register-link">
+                Pas encore de compte ?
+                <a routerLink="/auth/register">S'inscrire</a>
+              </p>
+
+            </form>
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+  </section>
+</main>
+
+<app-footer></app-footer>
