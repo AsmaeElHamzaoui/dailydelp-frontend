@@ -1,0 +1,106 @@
+<app-header></app-header>
+
+<main>
+  <section class="register-hero position-relative d-flex align-items-center">
+    
+    <!-- Background image -->
+    <div class="register-bg"></div>
+
+    <!-- Overlay -->
+    <div class="overlay"></div>
+
+    <div class="container position-relative z-index-1">
+      <div class="row justify-content-center">
+        <div class="col-lg-10">
+
+          <div class="register-card-premium animate-fade-in">
+
+            <!-- Left text -->
+            <div class="register-info">
+              <span class="section-tag">Rejoignez-nous</span>
+              <h2>
+                Commencez votre<br>
+                <span>aventure collective</span>
+              </h2>
+              <p>
+                Transformez vos efforts quotidiens en succès durables.
+                Une communauté, un objectif, un rythme humain.
+              </p>
+            </div>
+
+            <!-- Form -->
+            <form class="register-form"
+                  [formGroup]="registerForm"
+                  (ngSubmit)="onSubmit()">
+
+              <h3>Créer un compte</h3>
+
+              <div class="form-grid">
+
+                <div class="form-group">
+                  <i class="bi bi-person"></i>
+                  <input type="text"
+                         placeholder="Nom d'affichage"
+                         formControlName="displayName">
+                </div>
+
+                <div class="form-group">
+                  <i class="bi bi-envelope"></i>
+                  <input type="email"
+                         placeholder="Email"
+                         formControlName="email">
+                </div>
+
+                <div class="form-group">
+                  <i class="bi bi-lock"></i>
+                  <input type="password"
+                         placeholder="Mot de passe"
+                         formControlName="password">
+                </div>
+
+                <div class="form-group">
+                  <i class="bi bi-lock-fill"></i>
+                  <input type="password"
+                         placeholder="Confirmer le mot de passe"
+                         formControlName="confirmPassword">
+                </div>
+
+                <div class="form-group full">
+                  <i class="bi bi-chat-dots"></i>
+                  <textarea rows="2"
+                            placeholder="Bio (optionnel)"
+                            formControlName="bio"></textarea>
+                </div>
+
+              </div>
+
+              <!-- Messages -->
+              <div class="alert alert-danger" *ngIf="errorMessage">
+                {{ errorMessage }}
+              </div>
+
+              <div class="alert alert-success" *ngIf="successMessage">
+                {{ successMessage }}
+              </div>
+
+              <button class="btn-register" [disabled]="isLoading">
+                <span *ngIf="!isLoading">Créer mon compte</span>
+                <span *ngIf="isLoading">Inscription...</span>
+              </button>
+
+              <p class="login-link">
+                Déjà un compte ?
+                <a routerLink="/auth/login">Se connecter</a>
+              </p>
+
+            </form>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+  </section>
+</main>
+
+<app-footer></app-footer>
