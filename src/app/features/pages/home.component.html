@@ -1,0 +1,119 @@
+<app-header></app-header>
+
+<main>
+  <section id="hero" class="hero-section position-relative d-flex align-items-center text-white"
+         style="height: 100vh; min-height: 600px; background: url('images/hero.png') center center / cover no-repeat;">
+  
+  <!-- Overlay sombre -->
+  <div class="overlay position-absolute w-100 h-100" 
+       style="background-color: rgba(0,0,0,0.4); top:0; left:0;"></div>
+
+  <!-- Contenu centré -->
+  <div class="container position-relative z-index-1 text-center fade-in-section">
+    <h1 class="display-3 fw-bold mb-3">
+      Bougez ensemble, <br>
+      <span style="color: #9EAD84;">restez motivés.</span>
+    </h1>
+    <p class="lead mb-4">
+      L'application qui transforme vos habitudes sportives en victoires collectives.
+    </p>
+    <button class="btn btn-lg px-5 py-3 rounded-pill text-white fw-bold shadow"
+            style="background-color: #547D54;">
+      Commencer l'aventure
+    </button>
+  </div>
+</section>
+
+
+  <section id="about" class="about-premium-section py-6">
+  <div class="container py-lg-5">
+    <div class="row align-items-stretch gy-5">
+      
+      <div class="col-lg-7 d-flex flex-column justify-content-center animate-fade-in">
+        <div class="section-tag mb-3">À propos de nous</div>
+        <h2 class="display-4 fw-bold mb-4 text-dark-green">
+          Pourquoi <span class="text-highlight">DailyHelp</span> ?
+        </h2>
+        <div class="content-body pe-lg-5">
+          <p class="lead-text mb-4">
+            Le manque de régularité est le premier frein au bien-être. 
+            DailyHelp n'est pas qu'une app de fitness, c'est un <strong>compagnon humain</strong>. 
+            Nous privilégions la <span class="emphasis">valorisation des efforts</span> plutôt que la pure performance.
+          </p>
+          <p class="secondary-text">
+            Notre mission : Transformer l'effort individuel en une expérience collective durable 
+            grâce à une architecture moderne et une communauté soudée.
+          </p>
+        </div>
+      </div>
+
+      <div class="col-lg-5 animate-slide-up">
+        <div class="vision-card h-100 d-flex flex-column justify-content-center p-5">
+          <div class="vision-icon mb-4">
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+          </div>
+          <h4 class="vision-title mb-3">Notre Vision</h4>
+          <p class="vision-text mb-0">
+            Créer un monde où chaque petit pas compte et où personne ne s'entraîne seul.
+          </p>
+          <div class="vision-decoration"></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+  <section id="services" class="py-5" style="background-color: #D5D1C6;">
+    <div class="container py-5 fade-in-section">
+      <div class="text-center mb-5">
+        <h2 class="fw-bold" style="color: #324C40;">Nos Fonctionnalités</h2>
+        <div class="mx-auto" style="width: 60px; height: 4px; background-color: #547D54;"></div>
+      </div>
+      <div class="row g-4">
+        <div class="col-md-4" *ngFor="let srv of [
+          {title: 'Suivi quotidien', desc: 'Interface simple de check-in pour valider vos habitudes.', icon: 'bi-calendar-check'},
+          {title: 'Défis Progressifs', desc: 'Des challenges courts adaptés à votre niveau réel.', icon: 'bi-trophy'},
+          {title: 'Coach Communautaire', desc: 'Un accompagnement humain pour ne jamais lâcher.', icon: 'bi-people'},
+          {title: 'Gamification', desc: 'Gagnez des badges et débloquez des récompenses.', icon: 'bi-controller'},
+          {title: 'Abonnement Premium', desc: 'Statistiques détaillées et suivi personnalisé.', icon: 'bi-star-fill'}
+        ]">
+          <div class="card h-100 border-0 shadow-sm p-4 card-hover">
+            <div class="fs-1 mb-3" style="color: #547D54;"><i [class]="'bi ' + srv.icon"></i></div>
+            <h5 class="fw-bold">{{srv.title}}</h5>
+            <p class="text-muted small">{{srv.desc}}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="contact" class="py-5 fade-in-section">
+    <div class="container py-5">
+      <div class="row justify-content-center">
+        <div class="col-md-6">
+          <div class="bg-white p-5 rounded-4 shadow">
+            <h2 class="text-center mb-4" style="color: #324C40;">Contactez-nous</h2>
+            <form [formGroup]="contactForm" (ngSubmit)="onSubmit()">
+              <div class="mb-3">
+                <label class="form-label">Nom</label>
+                <input type="text" class="form-control border-0 bg-light" formControlName="name">
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Email</label>
+                <input type="email" class="form-control border-0 bg-light" formControlName="email">
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Message</label>
+                <textarea class="form-control border-0 bg-light" rows="4" formControlName="message"></textarea>
+              </div>
+              <button type="submit" class="btn w-100 py-3 text-white fw-bold" [disabled]="contactForm.invalid" style="background-color: #38573F;">Envoyer</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<app-footer></app-footer>
