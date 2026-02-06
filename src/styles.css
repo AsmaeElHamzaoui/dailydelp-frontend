@@ -1,1 +1,39 @@
-/* You can add global styles to this file, and also import other style files */
+:root {
+  --primary-color: #547D54;
+  --secondary-color: #9EAD84;
+  --dark-green: #38573F;
+  --deep-forest: #324C40;
+  --cream: #D5D1C6;
+  --obsidian: #100B00;
+}
+
+body {
+  background-color: var(--cream);
+  color: var(--obsidian);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  scroll-behavior: smooth;
+}
+
+.btn-primary {
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
+  color: white;
+}
+
+.btn-primary:hover {
+  background-color: var(--dark-green);
+  border-color: var(--dark-green);
+  color: white;
+}
+
+/* Animation de fade-in pour les sections */
+.fade-in-section {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+}
+
+.fade-in-section.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
