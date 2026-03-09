@@ -12,8 +12,10 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
         Authorization: `Bearer ${token}`
       }
     });
+    console.log('[AuthInterceptor] JWT attached:', token);
     return next(clonedRequest);
   }
 
+   console.warn('[AuthInterceptor] No JWT found');
   return next(req);
 };

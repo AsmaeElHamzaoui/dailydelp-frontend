@@ -54,7 +54,7 @@ export class LoginComponent {
             this.router.navigate(['/coach']);
             break;
           case 'USER':
-            this.router.navigate(['/']);
+            this.router.navigate(['/user']);
             break;
           default:
             this.router.navigate(['/']);

@@ -1,0 +1,911 @@
+// ============================================================
+// VARIABLES
+// ============================================================
+$primary:       #324C40;
+$primary-lt:    #547D54;
+$accent:        #9EAD84;
+$accent-soft:   #e8efe0;
+$border:        #dde8d8;
+$white:         #ffffff;
+$surface:       #f9fbf7;
+$text:          #2c2c2c;
+$muted:         #7a8a7a;
+$danger:        #c0392b;
+$danger-soft:   #fff1f0;
+$radius-card:   18px;
+$radius-btn:    10px;
+$shadow-card:   0 2px 16px rgba(50,76,64,.09);
+$shadow-hover:  0 12px 36px rgba(50,76,64,.16);
+$transition:    all .22s ease;
+
+// ── Type palette ──────────────────────────────────────────────
+$types: (
+  sport:    (#e3f0fd, #1a6db5, #1a6db5),
+  wellness: (#e6f6ec, #1e7e46, #1e7e46),
+  health:   (#fde8e8, #c0392b, #c0392b),
+  learning: (#fffbe6, #b8860b, #b8860b),
+  mindset:  (#ede8fd, #6c3fb5, #6c3fb5),
+  social:   (#e8f5fd, #1a7fa0, #1a7fa0),
+  custom:   (#fff3e0, #e07b00, #e07b00),
+);
+
+// ============================================================
+// LAYOUT
+// ============================================================
+.habit-dashboard {
+  width: 100%;
+  font-family: 'Outfit', 'DM Sans', system-ui, sans-serif;
+}
+
+// ============================================================
+// STATS HERO
+// ============================================================
+.stats-hero {
+  background: linear-gradient(135deg, $primary 0%, $primary-lt 100%);
+  border-radius: 24px;
+  padding: 36px 32px 28px;
+  margin-bottom: 32px;
+  color: $white;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: -60px; right: -60px;
+    width: 240px; height: 240px;
+    background: rgba(255,255,255,.05);
+    border-radius: 50%;
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: -80px; left: -40px;
+    width: 280px; height: 280px;
+    background: rgba(255,255,255,.04);
+    border-radius: 50%;
+  }
+}
+
+.stats-hero-inner {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  margin-bottom: 28px;
+  position: relative;
+  z-index: 1;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.greeting-label {
+  font-size: .75rem;
+  text-transform: uppercase;
+  letter-spacing: .1em;
+  opacity: .7;
+  margin: 0 0 6px;
+}
+
+.greeting-title {
+  font-size: 1.9rem;
+  font-weight: 800;
+  margin: 0 0 4px;
+  line-height: 1.15;
+  animation: color-cycle-site 5s ease-in-out infinite;
+  transition: color 0.3s;
+
+  .title-accent { font-size: 1.6rem; }
+}
+.greeting-sub {
+  opacity: .7;
+  font-size: .85rem;
+  margin: 0;
+}
+
+// ── KPI row ───────────────────────────────────────────────────
+.kpi-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  position: relative;
+  z-index: 1;
+}
+
+.kpi-card {
+  background: rgba(255,255,255,.12);
+  border: 1px solid rgba(255,255,255,.15);
+  border-radius: 14px;
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  backdrop-filter: blur(8px);
+  transition: $transition;
+
+  &:hover { background: rgba(255,255,255,.18); }
+}
+
+.kpi-icon {
+  width: 40px; height: 40px;
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.1rem;
+  flex-shrink: 0;
+
+  &.kpi-green  { background: rgba(154,210,114,.25); color: #c1f0a0; }
+  &.kpi-blue   { background: rgba(100,180,255,.25); color: #a0d8f0; }
+  &.kpi-orange { background: rgba(255,170,80,.25);  color: #ffd9a0; }
+  &.kpi-purple { background: rgba(190,140,255,.25); color: #d8bcff; }
+}
+
+.kpi-value {
+  font-size: 1.35rem;
+  font-weight: 800;
+  margin: 0;
+  line-height: 1;
+}
+
+.kpi-label {
+  font-size: .72rem;
+  opacity: .7;
+  margin: 3px 0 0;
+}
+
+// ============================================================
+// FILTER BAR
+// ============================================================
+.filter-bar {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 28px;
+}
+
+.filter-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 16px;
+  border-radius: 30px;
+  border: 1.5px solid $border;
+  background: $white;
+  color: $muted;
+  font-size: .83rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: $transition;
+
+  i { font-size: .9rem; }
+
+  &:hover {
+    border-color: $primary-lt;
+    color: $primary-lt;
+  }
+
+  &.active {
+    background: $primary;
+    border-color: $primary;
+    color: $white;
+  }
+}
+
+// ============================================================
+// LOADING / EMPTY
+// ============================================================
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 80px 0;
+  color: $muted;
+
+  p { margin-top: 14px; font-size: .9rem; }
+}
+
+.spinner-ring {
+  width: 44px; height: 44px;
+  border: 4px solid $accent-soft;
+  border-top-color: $primary-lt;
+  border-radius: 50%;
+  animation: spin .7s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.empty-state {
+  text-align: center;
+  padding: 80px 20px;
+
+  .empty-illustration {
+    width: 88px; height: 88px;
+    border-radius: 50%;
+    background: $accent-soft;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.2rem;
+    color: $accent;
+    margin-bottom: 20px;
+  }
+
+  h3 {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: $text;
+    margin: 0 0 8px;
+  }
+
+  p {
+    color: $muted;
+    font-size: .9rem;
+    margin: 0 0 24px;
+  }
+}
+
+// ============================================================
+// HABIT GRID
+// ============================================================
+.habits-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+// ============================================================
+// HABIT CARD
+// ============================================================
+.habit-card {
+  background: $white;
+  border: 1px solid $border;
+  border-radius: $radius-card;
+  box-shadow: $shadow-card;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transition: $transition;
+  position: relative;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: $shadow-hover;
+    border-color: $accent;
+  }
+}
+
+// ── Top accent bar ────────────────────────────────────────────
+.card-accent-bar {
+  height: 4px;
+  width: 100%;
+
+  @each $name, $colors in $types {
+    $bg: nth($colors, 1);
+    $col: nth($colors, 2);
+    &.bar-#{$name} { background: $col; }
+  }
+}
+
+// ── Header row ────────────────────────────────────────────────
+.card-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px 0;
+}
+
+.card-header-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+// ── Type badges ───────────────────────────────────────────────
+.type-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: .72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+
+  @each $name, $colors in $types {
+    $bg:  nth($colors, 1);
+    $col: nth($colors, 2);
+    &.badge-#{$name} { background: $bg; color: $col; }
+  }
+}
+
+// ── Streak badge ──────────────────────────────────────────────
+.streak-badge {
+  background: linear-gradient(135deg, #ff8c00, #ff5722);
+  color: $white;
+  font-size: .7rem;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 20px;
+}
+
+.visibility-icon {
+  color: $muted;
+  font-size: .95rem;
+}
+
+// ── Card body ─────────────────────────────────────────────────
+.card-body {
+  padding: 12px 16px 16px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.habit-name {
+  font-size: 1rem;
+  font-weight: 700;
+  color: $text;
+  margin: 0;
+  line-height: 1.3;
+}
+
+.habit-desc {
+  font-size: .82rem;
+  color: $muted;
+  margin: 0;
+  line-height: 1.55;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.habit-meta {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.meta-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: .75rem;
+  color: $primary-lt;
+  font-weight: 500;
+  background: $accent-soft;
+  padding: 3px 8px;
+  border-radius: 6px;
+
+  i { font-size: .8rem; color: $accent; }
+}
+
+// ── Progress bar ──────────────────────────────────────────────
+.progress-section { margin-top: 2px; }
+
+.progress-header {
+  display: flex;
+  justify-content: space-between;
+  font-size: .73rem;
+  color: $muted;
+  margin-bottom: 5px;
+}
+
+.progress-count { font-weight: 600; color: $primary; }
+
+.progress-track {
+  height: 6px;
+  background: $accent-soft;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, $primary-lt, $accent);
+  border-radius: 4px;
+  transition: width .4s ease;
+}
+
+// ── Heatmap ───────────────────────────────────────────────────
+.heatmap {
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  gap: 3px;
+}
+
+.heatmap-cell {
+  aspect-ratio: 1;
+  border-radius: 3px;
+  background: $accent-soft;
+  transition: $transition;
+
+  &.active {
+    background: $primary-lt;
+  }
+}
+
+// ── Check-in banner ───────────────────────────────────────────
+.checkin-banner {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.banner-done {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: .78rem;
+  font-weight: 600;
+  color: #1e7e46;
+  background: #e6f6ec;
+  padding: 4px 10px;
+  border-radius: 6px;
+  width: fit-content;
+}
+
+.banner-miss {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: .78rem;
+  font-weight: 600;
+  color: $danger;
+  background: $danger-soft;
+  padding: 4px 10px;
+  border-radius: 6px;
+  width: fit-content;
+}
+
+.banner-note {
+  font-size: .75rem;
+  color: $muted;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding-left: 2px;
+
+  i { color: $accent; }
+}
+
+// ── Card actions ──────────────────────────────────────────────
+.card-actions {
+  display: flex;
+  gap: 8px;
+  padding: 10px 14px 14px;
+  border-top: 1px solid $border;
+}
+
+.action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 6px 10px;
+  border-radius: $radius-btn;
+  border: none;
+  cursor: pointer;
+  font-size: .78rem;
+  font-weight: 600;
+  transition: $transition;
+}
+
+.btn-checkin {
+  flex: 1;
+  background: $primary;
+  color: $white;
+  gap: 6px;
+
+  i { font-size: .95rem; }
+
+  &:hover { background: $primary-lt; }
+}
+
+.btn-edit {
+  background: $accent-soft;
+  color: $primary;
+
+  &:hover { background: $primary; color: $white; }
+}
+
+.btn-del {
+  background: $danger-soft;
+  color: $danger;
+
+  &:hover { background: $danger; color: $white; }
+}
+
+// ============================================================
+// SHARED BUTTONS
+// ============================================================
+.btn-primary-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: $white;
+  color: $primary;
+  border: none;
+  border-radius: $radius-btn;
+  padding: 11px 22px;
+  font-size: .9rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: $transition;
+  box-shadow: 0 2px 10px rgba(0,0,0,.12);
+
+  &:hover {
+    background: $accent-soft;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 16px rgba(0,0,0,.15);
+  }
+}
+
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: $primary;
+  color: $white;
+  border: none;
+  border-radius: $radius-btn;
+  padding: 10px 22px;
+  font-size: .9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: $transition;
+
+  &:hover:not(:disabled) { background: $primary-lt; }
+  &:disabled { opacity: .55; cursor: not-allowed; }
+}
+
+.btn-ghost {
+  background: transparent;
+  border: 1.5px solid $border;
+  color: $muted;
+  border-radius: $radius-btn;
+  padding: 10px 20px;
+  font-size: .9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: $transition;
+
+  &:hover { border-color: $primary; color: $primary; }
+}
+
+.btn-danger {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: $danger;
+  color: $white;
+  border: none;
+  border-radius: $radius-btn;
+  padding: 10px 20px;
+  font-size: .9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: $transition;
+
+  &:hover { background: darken($danger, 8%); }
+}
+
+.btn-danger-ghost {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: transparent;
+  border: 1.5px solid $danger;
+  color: $danger;
+  border-radius: $radius-btn;
+  padding: 9px 16px;
+  font-size: .85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: $transition;
+
+  &:hover { background: $danger-soft; }
+  &:disabled { opacity: .5; cursor: not-allowed; }
+}
+
+// ============================================================
+// MODALS
+// ============================================================
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(20, 30, 24, .5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  animation: fade-in .18s ease;
+  margin-top: 20px;
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.modal-sheet {
+  background: $white;
+  border-radius: 22px;
+  width: 100%;
+  max-width: 500px;
+  box-shadow: 0 24px 80px rgba(0,0,0,.22);
+  animation: slide-up .22s ease;
+  overflow: hidden;
+  max-height: 89vh;
+  overflow-y: auto;
+  margin-top: 40px; 
+
+  
+  &.modal-sm  { max-width: 440px; }
+  &.modal-xs  { max-width: 380px; }
+}
+
+@keyframes slide-up {
+  from { transform: translateY(28px); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+
+// ── Modal head ────────────────────────────────────────────────
+.modal-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px 12px;
+  border-bottom: 1px solid $border;
+
+  &.danger-head { background: $danger-soft; }
+}
+
+.modal-head-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.modal-icon {
+  width: 38px; height: 38px;
+  border-radius: 10px;
+  background: $accent-soft;
+  color: $primary;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1rem;
+
+  &.checkin-icon { background: #e6f6ec; color: #1e7e46; }
+  &.danger-icon  { background: $danger-soft; color: $danger; }
+}
+
+.modal-head h3 {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: $text;
+}
+
+.modal-subtitle {
+  margin: 2px 0 0;
+  font-size: .8rem;
+  color: $muted;
+}
+
+.modal-close {
+  background: transparent;
+  border: none;
+  color: $muted;
+  font-size: .95rem;
+  cursor: pointer;
+  width: 34px; height: 34px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  transition: $transition;
+
+  &:hover { background: $accent-soft; color: $primary; }
+}
+
+// ── Modal content / foot ──────────────────────────────────────
+.modal-content {
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.modal-foot {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 12px 20px 16px;
+  border-top: 1px solid $border;
+
+  &.modal-foot-split {
+    justify-content: space-between;
+    align-items: center;
+  }
+}
+
+.modal-foot-right {
+  display: flex;
+  gap: 10px;
+}
+
+// ── Form fields ───────────────────────────────────────────────
+.field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.field-label {
+  font-size: .78rem;
+  font-weight: 600;
+  color: $primary;
+
+  .req     { color: $danger; }
+  .optional { color: $muted; font-weight: 400; }
+}
+
+.field-input {
+  width: 100%;
+  padding: 7px 10px;
+  border: 1.5px solid $border;
+  border-radius: $radius-btn;
+  font-size: .82rem;
+  color: $text;
+  background: $white;
+  outline: none;
+  transition: border-color .18s;
+  box-sizing: border-box;
+  resize: none;
+  font-family: inherit;
+
+  &:focus { border-color: $primary-lt; }
+  &.field-error { border-color: $danger; }
+}
+
+.field-err-msg {
+  font-size: .75rem;
+  color: $danger;
+}
+
+.field-row-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+// ── Toggle ────────────────────────────────────────────────────
+.toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px;
+  background: $surface;
+  border-radius: 12px;
+  border: 1px solid $border;
+}
+
+.toggle-title {
+  font-size: .87rem;
+  font-weight: 600;
+  color: $text;
+  margin: 0 0 2px;
+}
+
+.toggle-sub {
+  font-size: .75rem;
+  color: $muted;
+  margin: 0;
+}
+
+.toggle-pill {
+  width: 46px; height: 26px;
+  background: $border;
+  border-radius: 13px;
+  position: relative;
+  cursor: pointer;
+  transition: background .2s;
+
+  &.on { background: $primary-lt; }
+}
+
+.toggle-knob {
+  position: absolute;
+  top: 3px; left: 3px;
+  width: 20px; height: 20px;
+  background: $white;
+  border-radius: 50%;
+  box-shadow: 0 1px 5px rgba(0,0,0,.2);
+  transition: left .2s;
+
+  .toggle-pill.on & { left: 23px; }
+}
+
+// ── Status selector ───────────────────────────────────────────
+.status-selector {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.status-option {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 14px 10px;
+  border-radius: 12px;
+  border: 2px solid $border;
+  cursor: pointer;
+  font-size: .83rem;
+  font-weight: 600;
+  color: $muted;
+  transition: $transition;
+  background: $white;
+
+  i { font-size: 1.3rem; }
+
+  &.sel-done {
+    border-color: #1e7e46;
+    background: #e6f6ec;
+    color: #1e7e46;
+  }
+
+  &.sel-miss {
+    border-color: $danger;
+    background: $danger-soft;
+    color: $danger;
+  }
+
+  &:hover { border-color: $primary-lt; }
+}
+
+// ── Delete confirm ────────────────────────────────────────────
+.delete-confirm-text {
+  font-size: .93rem;
+  color: $text;
+  margin: 0 0 6px;
+}
+
+.delete-warn {
+  font-size: .82rem;
+  color: $danger;
+  margin: 0;
+}
+
+// ── Spinner icon ──────────────────────────────────────────────
+.spin-icon {
+  animation: spin .7s linear infinite;
+}
+
+// ============================================================
+// RESPONSIVE
+// ============================================================
+@media (max-width: 900px) {
+  .kpi-row { grid-template-columns: 1fr 1fr; }
+}
+
+@media (max-width: 600px) {
+  .stats-hero { padding: 24px 18px 20px; }
+  .greeting-title { font-size: 1.4rem; }
+  .kpi-row { grid-template-columns: 1fr 1fr; gap: 10px; }
+  .habits-grid { grid-template-columns: 1fr; }
+  .field-row-2 { grid-template-columns: 1fr; }
+  .modal-foot { flex-direction: column; }
+  .modal-foot-split { flex-direction: column; gap: 12px; }
+  .modal-foot-right { width: 100%; justify-content: flex-end; }
+  .status-selector { grid-template-columns: 1fr 1fr; }
+}
+
+// ── Animation des couleurs du titre selon la palette du site ──
+@keyframes color-cycle-site {
+  10%   { color: $primary; }
+  40%  { color: $primary-lt; }
+  80%  { color: $accent; }
+  100% { color: $primary; }
+}
+
