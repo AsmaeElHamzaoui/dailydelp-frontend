@@ -1,0 +1,317 @@
+<section class="habit-dashboard">
+
+  <!-- ══════════ STATS HERO ══════════ -->
+  <div class="stats-hero">
+    <div class="stats-hero-inner">
+      <div class="greeting-block">
+        <h1 class="greeting-title">Mes Habitudes</h1>
+        <p class="greeting-sub">{{ totalHabits }} habitude{{ totalHabits !== 1 ? 's' : '' }} suivies</p>
+      </div>
+      <button class="btn-primary-cta" (click)="openHabitModal()">
+        <i class="bi bi-plus-lg"></i> Nouvelle habitude
+      </button>
+    </div>
+
+    <div class="kpi-row">
+      <div class="kpi-card">
+        <span class="kpi-icon kpi-green"><i class="bi bi-check2-all"></i></span>
+        <div>
+          <p class="kpi-value">{{ completedToday }}</p>
+          <p class="kpi-label">Complétées aujourd'hui</p>
+        </div>
+      </div>
+      <div class="kpi-card">
+        <span class="kpi-icon kpi-blue"><i class="bi bi-list-check"></i></span>
+        <div>
+          <p class="kpi-value">{{ totalHabits }}</p>
+          <p class="kpi-label">Total habitudes</p>
+        </div>
+      </div>
+      <div class="kpi-card">
+        <span class="kpi-icon kpi-orange"><i class="bi bi-fire"></i></span>
+        <div>
+          <p class="kpi-value">{{ longestStreak }}j</p>
+          <p class="kpi-label">Meilleure série</p>
+        </div>
+      </div>
+      <div class="kpi-card">
+        <span class="kpi-icon kpi-purple"><i class="bi bi-graph-up-arrow"></i></span>
+        <div>
+          <p class="kpi-value">{{ completionRate }}%</p>
+          <p class="kpi-label">Taux de complétion</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════ FILTERS ══════════ -->
+  <div class="filter-bar">
+    <button class="filter-chip" [class.active]="activeFilter==='ALL'"      (click)="filterHabits('ALL')">Toutes</button>
+    <button class="filter-chip" [class.active]="activeFilter==='SPORT'"    (click)="filterHabits('SPORT')"><i class="bi bi-bicycle"></i> Sport</button>
+    <button class="filter-chip" [class.active]="activeFilter==='WELLNESS'" (click)="filterHabits('WELLNESS')"><i class="bi bi-heart-pulse"></i> Bien-être</button>
+    <button class="filter-chip" [class.active]="activeFilter==='HEALTH'"   (click)="filterHabits('HEALTH')"><i class="bi bi-activity"></i> Santé</button>
+    <button class="filter-chip" [class.active]="activeFilter==='LEARNING'" (click)="filterHabits('LEARNING')"><i class="bi bi-book"></i> Apprentissage</button>
+    <button class="filter-chip" [class.active]="activeFilter==='CUSTOM'"   (click)="filterHabits('CUSTOM')"><i class="bi bi-star"></i> Personnalisé</button>
+  </div>
+
+  <!-- ══════════ LOADING ══════════ -->
+  <div class="loading-state" *ngIf="loading">
+    <div class="spinner-ring"></div>
+    <p>Chargement de vos habitudes…</p>
+  </div>
+
+  <!-- ══════════ EMPTY STATE ══════════ -->
+  <div class="empty-state" *ngIf="!loading && filteredHabits.length === 0">
+    <div class="empty-illustration">
+      <i class="bi bi-stars"></i>
+    </div>
+    <h3>Aucune habitude pour le moment</h3>
+    <p>Commencez par créer votre première habitude et construisez votre routine idéale.</p>
+    <button class="btn-primary-cta" (click)="openHabitModal()">
+      <i class="bi bi-plus-lg"></i> Créer ma première habitude
+    </button>
+  </div>
+
+  <!-- ══════════ HABIT GRID ══════════ -->
+  <div class="habits-grid" *ngIf="!loading && filteredHabits.length > 0">
+
+    <div class="habit-card" *ngFor="let habit of filteredHabits">
+
+      <!-- Card top accent bar -->
+      <div class="card-accent-bar" [ngClass]="'bar-' + getTypeConfig(habit.type).cls"></div>
+
+      <!-- Header row -->
+      <div class="card-header-row">
+        <span class="type-badge" [ngClass]="'badge-' + getTypeConfig(habit.type).cls">
+          <i class="bi" [ngClass]="getTypeConfig(habit.type).icon"></i>
+          {{ getTypeConfig(habit.type).label }}
+        </span>
+        <div class="card-header-right">
+          <span class="streak-badge" *ngIf="(habit.streak ?? 0) >= 3" title="{{ habit.streak }} jours consécutifs">
+            {{ getStreakLabel(habit.streak ?? 0) }} {{ habit.streak }}j
+          </span>
+          <i class="bi visibility-icon" [ngClass]="habit.isPublic ? 'bi-globe2' : 'bi-lock-fill'"
+             [title]="habit.isPublic ? 'Public' : 'Privé'"></i>
+        </div>
+      </div>
+
+      <!-- Body -->
+      <div class="card-body">
+        <h3 class="habit-name">{{ habit.title }}</h3>
+        <p class="habit-desc" *ngIf="habit.description">{{ habit.description }}</p>
+
+        <div class="habit-meta">
+          <span class="meta-chip"><i class="bi bi-calendar3"></i> {{ getFrequencyLabel(habit.frequency) }}</span>
+        </div>
+
+        <!-- Progress bar -->
+        <div class="progress-section">
+          <div class="progress-header">
+            <span>Progression hebdomadaire</span>
+            <span class="progress-count">{{ habit.weeklyProgress ?? 0 }}/{{ getFrequencyMax(habit.frequency) }} jours</span>
+          </div>
+          <div class="progress-track">
+            <div class="progress-fill" [style.width.%]="progressPercent(habit)"></div>
+          </div>
+        </div>
+
+        <!-- Heatmap -->
+        <div class="heatmap">
+          <ng-container *ngFor="let cell of getHeatmapCells(habit)">
+            <div class="heatmap-cell" [class.active]="cell.active"></div>
+          </ng-container>
+        </div>
+
+        <!-- Check-in status banner -->
+        <div class="checkin-banner" *ngIf="habit.checkIn !== null && habit.checkIn !== undefined">
+          <ng-container *ngIf="habit.checkIn.status === true">
+            <span class="banner-done"><i class="bi bi-check-circle-fill"></i> Complété aujourd'hui</span>
+          </ng-container>
+          <ng-container *ngIf="habit.checkIn.status === false">
+            <span class="banner-miss"><i class="bi bi-x-circle-fill"></i> Non complété</span>
+          </ng-container>
+          <span class="banner-note" *ngIf="habit.checkIn.note">
+            <i class="bi bi-chat-left-text"></i> {{ habit.checkIn.note }}
+          </span>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="card-actions">
+        <button class="action-btn btn-checkin" (click)="openCheckInModal(habit)" title="Check-in">
+          <i class="bi bi-check2-circle"></i>
+          <span>Check-in</span>
+        </button>
+        <button class="action-btn btn-edit" (click)="editHabit(habit)" title="Modifier">
+          <i class="bi bi-pencil"></i>
+        </button>
+        <button class="action-btn btn-del" (click)="confirmDelete(habit)" title="Supprimer">
+          <i class="bi bi-trash3"></i>
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+</section>
+
+<!-- ══════════ HABIT MODAL ══════════ -->
+<div class="modal-overlay" *ngIf="showHabitModal" (click)="closeModalOnOverlay($event, 'habit')">
+  <div class="modal-sheet " (click)="$event.stopPropagation()">
+
+    <div class="modal-head">
+      <div class="modal-head-left">
+        <span class="modal-icon"><i class="bi" [ngClass]="isEditing ? 'bi-pencil-square' : 'bi-plus-circle'"></i></span>
+        <h3>{{ isEditing ? 'Modifier l\'habitude' : 'Nouvelle habitude' }}</h3>
+      </div>
+      <button class="modal-close" (click)="closeHabitModal()"><i class="bi bi-x-lg"></i></button>
+    </div>
+
+    <div class="modal-content">
+
+      <div class="field-group">
+        <label class="field-label">Titre <span class="req">*</span></label>
+        <input type="text" [(ngModel)]="habitForm.title" class="field-input"
+               [class.field-error]="formErrors.title" placeholder="Ex: Méditer 10 minutes chaque matin" />
+        <span class="field-err-msg" *ngIf="formErrors.title">Le titre est requis</span>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Description</label>
+        <textarea [(ngModel)]="habitForm.description" class="field-input" rows="3"
+                  placeholder="Décrivez l'habitude et son objectif…"></textarea>
+      </div>
+
+      <div class="field-row-2">
+        <div class="field-group">
+          <label class="field-label">Type <span class="req">*</span></label>
+          <select [(ngModel)]="habitForm.type" class="field-input" [class.field-error]="formErrors.type">
+            <option value="">— Choisir —</option>
+            <option value="SPORT">🚴 Sport</option>
+            <option value="WELLNESS">💚 Bien-être</option>
+            <option value="HEALTH">❤️ Santé</option>
+            <option value="LEARNING">📚 Apprentissage</option>
+            <option value="MINDSET">🧠 Mindset</option>
+            <option value="SOCIAL">👥 Social</option>
+            <option value="CUSTOM">⭐ Personnalisé</option>
+          </select>
+          <span class="field-err-msg" *ngIf="formErrors.type">Le type est requis</span>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">Fréquence <span class="req">*</span></label>
+          <select [(ngModel)]="habitForm.frequency" class="field-input" [class.field-error]="formErrors.frequency">
+            <option value="">— Choisir —</option>
+            <option value="DAILY">Quotidienne</option>
+            <option value="WEEKLY">Hebdomadaire</option>
+            <option value="MONTHLY">Mensuelle</option>
+          </select>
+          <span class="field-err-msg" *ngIf="formErrors.frequency">La fréquence est requise</span>
+        </div>
+      </div>
+
+      <div class="toggle-row">
+        <div>
+          <p class="toggle-title">Habitude publique</p>
+          <p class="toggle-sub">Visible par les autres utilisateurs</p>
+        </div>
+        <div class="toggle-pill" [class.on]="habitForm.isPublic" (click)="habitForm.isPublic = !habitForm.isPublic">
+          <div class="toggle-knob"></div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="modal-foot">
+      <button class="btn-ghost" (click)="closeHabitModal()">Annuler</button>
+      <button class="btn-primary" (click)="saveHabit()" [disabled]="saving">
+        <i class="bi bi-hourglass-split spin-icon" *ngIf="saving"></i>
+        <span>{{ saving ? 'En cours…' : (isEditing ? 'Mettre à jour' : 'Créer l\'habitude') }}</span>
+      </button>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════ CHECK-IN MODAL ══════════ -->
+<div class="modal-overlay" *ngIf="showCheckInModal" (click)="closeModalOnOverlay($event, 'checkin')">
+  <div class="modal-sheet modal-sm" (click)="$event.stopPropagation()">
+
+    <div class="modal-head">
+      <div class="modal-head-left">
+        <span class="modal-icon checkin-icon"><i class="bi bi-check2-circle"></i></span>
+        <div>
+          <h3>Check-in</h3>
+          <p class="modal-subtitle">{{ selectedHabit?.title }}</p>
+        </div>
+      </div>
+      <button class="modal-close" (click)="closeCheckInModal()"><i class="bi bi-x-lg"></i></button>
+    </div>
+
+    <div class="modal-content">
+
+      <div class="field-group">
+        <label class="field-label">Date</label>
+        <input type="datetime-local" [(ngModel)]="checkInForm.date" class="field-input" />
+      </div>
+
+      <div class="status-selector">
+        <div class="status-option" [class.sel-done]="checkInForm.status === true" (click)="checkInForm.status = true">
+          <i class="bi bi-check-circle-fill"></i>
+          <span>Complété ✓</span>
+        </div>
+        <div class="status-option" [class.sel-miss]="checkInForm.status === false" (click)="checkInForm.status = false">
+          <i class="bi bi-x-circle-fill"></i>
+          <span>Non complété ✗</span>
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Note <span class="optional">(optionnel)</span></label>
+        <textarea [(ngModel)]="checkInForm.note" class="field-input" rows="3"
+                  placeholder="Comment s'est passée cette habitude ?"></textarea>
+      </div>
+
+    </div>
+
+    <div class="modal-foot modal-foot-split">
+      <button class="btn-danger-ghost" (click)="deleteCheckIn()"
+              *ngIf="selectedHabit?.checkIn" [disabled]="checkInDeleting">
+        <i class="bi bi-trash3"></i>
+        {{ checkInDeleting ? '…' : 'Supprimer' }}
+      </button>
+      <div class="modal-foot-right">
+        <button class="btn-ghost" (click)="closeCheckInModal()">Annuler</button>
+        <button class="btn-primary" (click)="saveCheckIn()" [disabled]="checkInSaving">
+          <i class="bi bi-hourglass-split spin-icon" *ngIf="checkInSaving"></i>
+          {{ checkInSaving ? 'En cours…' : 'Enregistrer' }}
+        </button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════ DELETE CONFIRM ══════════ -->
+<div class="modal-overlay" *ngIf="showDeleteConfirm" (click)="closeModalOnOverlay($event, 'delete')">
+  <div class="modal-sheet modal-xs" (click)="$event.stopPropagation()">
+    <div class="modal-head danger-head">
+      <div class="modal-head-left">
+        <span class="modal-icon danger-icon"><i class="bi bi-exclamation-triangle-fill"></i></span>
+        <h3>Supprimer l'habitude</h3>
+      </div>
+    </div>
+    <div class="modal-content">
+      <p class="delete-confirm-text">
+        Êtes-vous sûr de vouloir supprimer <strong>"{{ habitToDelete?.title }}"</strong> ?
+      </p>
+      <p class="delete-warn">Cette action est irréversible.</p>
+    </div>
+    <div class="modal-foot">
+      <button class="btn-ghost" (click)="closeDeleteConfirm()">Annuler</button>
+      <button class="btn-danger" (click)="deleteHabit()">
+        <i class="bi bi-trash3-fill"></i> Supprimer définitivement
+      </button>
+    </div>
+  </div>
+</div>
