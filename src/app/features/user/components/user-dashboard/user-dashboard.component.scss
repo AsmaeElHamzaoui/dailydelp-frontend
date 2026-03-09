@@ -1,0 +1,51 @@
+$primary:     #324C40;
+$primary-lt:  #547D54;
+$accent:      #9EAD84;
+$accent-soft: #e8efe0;
+$white:       #ffffff;
+
+// ── Page root ───────────────────────────────────────────────
+.dashboard-root {
+  position: relative;
+  min-height: 100vh;
+  font-family: 'Outfit', 'DM Sans', system-ui, sans-serif;
+
+  /* IMAGE BACKGROUND */
+  background-image: url('/images/habit.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+/* Overlay pour améliorer la lisibilité */
+.dashboard-root::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+
+   background: linear-gradient(
+    rgba(198, 208, 192, 0.95),
+    rgba(253, 254, 252, 0.9)
+  );
+
+  z-index: 0;
+}
+
+/* ── Body ────────────────────────────────────────────────── */
+.dash-body {
+  position: relative;
+  z-index: 1;
+
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 60px 32px;
+}
+
+/* ── Responsive ─────────────────────────────────────────── */
+@media (max-width: 768px) {
+
+  .dash-body {
+    padding: 40px 20px;
+  }
+
+}
