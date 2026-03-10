@@ -67,7 +67,7 @@ import { AuthService } from '../../core/services/auth.service';
               Mon espace
             </a>
 
-            <a routerLink="/profile" class="popup-item">
+            <a routerLink="/user/profile" class="popup-item">
               <i class="bi bi-person"></i>
               Profil
             </a>
