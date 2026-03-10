@@ -1,0 +1,251 @@
+<app-header></app-header>
+
+<main class="profile-root">
+
+  <!-- ░░ BACKGROUND MESH ░░ -->
+  <div class="bg-mesh" aria-hidden="true">
+    <div class="mesh-orb mesh-orb--1"></div>
+    <div class="mesh-orb mesh-orb--2"></div>
+    <div class="mesh-orb mesh-orb--3"></div>
+  </div>
+
+  <!-- ── LOADING SKELETON ── -->
+  <div class="profile-layout" *ngIf="isLoading()">
+    <div class="identity-card skeleton-card">
+      <div class="sk sk--avatar"></div>
+      <div class="sk sk--line sk--lg"></div>
+      <div class="sk sk--line sk--sm"></div>
+      <div class="sk sk--line sk--md"></div>
+      <div class="sk sk--line sk--md"></div>
+    </div>
+    <div class="main-panel">
+      <div class="sk sk--line sk--xl" style="margin-bottom:8px"></div>
+      <div class="sk sk--line sk--sm" style="margin-bottom:32px"></div>
+      <div class="fields-grid skeleton-grid">
+        <div class="sk sk--field" *ngFor="let i of [1,2,3,4]"></div>
+        <div class="sk sk--field sk--field-full"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── MAIN CONTENT ── -->
+  <div class="profile-layout" *ngIf="!isLoading()">
+
+    <!-- ══════════════════════════════════════
+         LEFT SIDEBAR — Identity card
+    ══════════════════════════════════════ -->
+    <aside class="identity-card">
+
+      <!-- Avatar -->
+      <div class="avatar-zone"
+           (mouseenter)="avatarHovered.set(true)"
+           (mouseleave)="avatarHovered.set(false)">
+
+        <div class="avatar-ring">
+          <img *ngIf="avatarUrl"
+               [src]="avatarUrl"
+               alt="Profile photo"
+               class="avatar-photo" />
+
+          <div *ngIf="!avatarUrl" class="avatar-initials">
+            {{ initials }}
+          </div>
+
+          <div class="avatar-overlay" [class.visible]="avatarHovered()">
+            <label class="avatar-upload-btn" for="avatar-input">
+              <i class="bi bi-camera-fill"></i>
+              <span>Change</span>
+            </label>
+            <input id="avatar-input"
+                   type="file"
+                   accept="image/*"
+                   (change)="onAvatarChange($event)"
+                   hidden />
+          </div>
+        </div>
+
+        <div class="avatar-status-dot" title="Online"></div>
+      </div>
+
+      <!-- Identity -->
+      <div class="identity-text">
+        <h2 class="identity-name">{{ form.displayName || username }}</h2>
+        <span class="identity-handle">{{ '@' + username }}</span>
+      </div>
+
+      <!-- Role badge -->
+      <span class="role-badge" [ngClass]="roleClass">
+        <i class="bi bi-shield-check"></i>
+        {{ role }}
+      </span>
+
+      <!-- Divider -->
+      <div class="sidebar-divider"></div>
+
+      <!-- Meta items -->
+      <ul class="meta-list">
+        <li class="meta-item">
+          <span class="meta-icon"><i class="bi bi-envelope"></i></span>
+          <div class="meta-content">
+            <span class="meta-label">Email</span>
+            <span class="meta-value">{{ email }}</span>
+          </div>
+        </li>
+        <li class="meta-item">
+          <span class="meta-icon"><i class="bi bi-globe2"></i></span>
+          <div class="meta-content">
+            <span class="meta-label">Timezone</span>
+            <span class="meta-value">{{ form.timezone }}</span>
+          </div>
+        </li>
+        <li class="meta-item" *ngIf="form.bio">
+          <span class="meta-icon"><i class="bi bi-chat-quote"></i></span>
+          <div class="meta-content">
+            <span class="meta-label">Bio</span>
+            <span class="meta-value bio-preview">{{ form.bio }}</span>
+          </div>
+        </li>
+      </ul>
+
+    </aside>
+
+    <!-- ══════════════════════════════════════
+         MAIN PANEL — Editable fields
+    ══════════════════════════════════════ -->
+    <section class="main-panel">
+
+      <!-- Panel header -->
+      <div class="panel-header">
+        <div class="panel-title-group">
+          <h1 class="panel-title">Profile Settings</h1>
+          <p class="panel-subtitle">Manage your public identity and preferences</p>
+        </div>
+
+        <div class="panel-actions" *ngIf="!isEditing()">
+          <button class="btn btn--ghost" (click)="startEdit()">
+            <i class="bi bi-pencil"></i>
+            Edit profile
+          </button>
+        </div>
+      </div>
+
+      <!-- Success toast -->
+      <div class="toast toast--success" [class.toast--visible]="saveSuccess()">
+        <i class="bi bi-check-circle-fill"></i>
+        Changes saved successfully
+      </div>
+
+      <!-- Error toast -->
+      <div class="toast toast--error" [class.toast--visible]="saveError()">
+        <i class="bi bi-exclamation-circle-fill"></i>
+        {{ saveError() }}
+      </div>
+
+      <!-- ── FORM ── -->
+      <div class="fields-grid">
+
+        <!-- Display Name -->
+        <div class="field-group">
+          <label class="field-label" for="displayName">Display Name</label>
+          <div class="field-input-wrap" [class.field-input-wrap--readonly]="!isEditing()">
+            <i class="bi bi-person field-icon"></i>
+            <input id="displayName"
+                   type="text"
+                   class="field-input"
+                   [(ngModel)]="form.displayName"
+                   [readonly]="!isEditing()"
+                   placeholder="Your display name" />
+          </div>
+        </div>
+
+        <!-- Email (always readonly) -->
+        <div class="field-group">
+          <label class="field-label" for="emailField">
+            Email Address
+            <span class="field-badge">Verified</span>
+          </label>
+          <div class="field-input-wrap field-input-wrap--readonly">
+            <i class="bi bi-envelope field-icon"></i>
+            <input id="emailField"
+                   type="email"
+                   class="field-input"
+                   [value]="email"
+                   readonly />
+          </div>
+        </div>
+
+        <!-- Timezone -->
+        <div class="field-group">
+          <label class="field-label" for="timezone">Timezone</label>
+          <div class="field-input-wrap field-select-wrap"
+               [class.field-input-wrap--readonly]="!isEditing()">
+            <i class="bi bi-globe2 field-icon"></i>
+            <select id="timezone"
+                    class="field-input field-select"
+                    [(ngModel)]="form.timezone"
+                    [disabled]="!isEditing()">
+              <option *ngFor="let tz of timezones" [value]="tz">{{ tz }}</option>
+            </select>
+            <i class="bi bi-chevron-down select-arrow" *ngIf="isEditing()"></i>
+          </div>
+        </div>
+
+        <!-- Role (readonly) -->
+        <div class="field-group">
+          <label class="field-label">Role</label>
+          <div class="field-input-wrap field-input-wrap--readonly">
+            <i class="bi bi-shield-check field-icon"></i>
+            <input type="text"
+                   class="field-input"
+                   [value]="role"
+                   readonly />
+          </div>
+        </div>
+
+        <!-- Bio — full width -->
+        <div class="field-group field-group--full">
+          <label class="field-label" for="bio">
+            Bio
+            <span class="field-optional">optional</span>
+          </label>
+          <div class="field-textarea-wrap"
+               [class.field-input-wrap--readonly]="!isEditing()">
+            <textarea id="bio"
+                      class="field-textarea"
+                      [(ngModel)]="form.bio"
+                      [readonly]="!isEditing()"
+                      rows="4"
+                      maxlength="200"
+                      placeholder="Tell your team a little about yourself…"></textarea>
+            <span class="char-count" *ngIf="isEditing()">
+              {{ form.bio.length }} / 200
+            </span>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ── FORM ACTIONS ── -->
+      <div class="form-footer" *ngIf="isEditing()">
+        <button class="btn btn--ghost"
+                (click)="cancelEdit()"
+                [disabled]="isSaving()">
+          Cancel
+        </button>
+        <button class="btn btn--primary"
+                (click)="saveChanges()"
+                [class.btn--loading]="isSaving()"
+                [disabled]="isSaving()">
+          <span class="btn-spinner" *ngIf="isSaving()"></span>
+          <i class="bi bi-check2" *ngIf="!isSaving()"></i>
+          {{ isSaving() ? 'Saving…' : 'Save changes' }}
+        </button>
+      </div>
+
+    </section>
+
+  </div>
+
+</main>
+
+<app-footer></app-footer>
