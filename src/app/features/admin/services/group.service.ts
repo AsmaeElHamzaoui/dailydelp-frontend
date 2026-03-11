@@ -4,20 +4,20 @@ import { Observable } from 'rxjs';
 import { environment } from '../../../../environments/environment';
 
 export interface GroupRequest {
-  name:        string;
+  name: string;
   description: string;
-  coachId:     number;
-  memberIds?:  number[];
+  coachId: number;
+  memberIds?: number[];
 }
 
 export interface GroupResponse {
-  id:           number;
-  name:         string;
-  description:  string;
-  coachId:      number;
-  coachName:    string;
-  memberCount:  number;
-  createdAt:    string;
+  id: number;
+  name: string;
+  description: string;
+  coachId: number;
+  coachName: string;
+  memberCount: number;
+  createdAt: string;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -25,8 +25,8 @@ export class AdminGroupService {
 
   private readonly base = `${environment.apiUrl}/api/admin/groups`;
 
-  constructor(private http: HttpClient) {}
-getGroups(): Observable<GroupResponse[]> {
+  constructor(private http: HttpClient) { }
+  getGroups(): Observable<GroupResponse[]> {
     return this.http.get<GroupResponse[]>(this.base);
   }
 
@@ -49,5 +49,5 @@ getGroups(): Observable<GroupResponse[]> {
   deleteGroup(id: number): Observable<void> {
     return this.http.delete<void>(`${this.base}/${id}`);
   }
-  
+
 }
