@@ -1,0 +1,272 @@
+<section class="users-dashboard">
+
+  <!-- ══════════ STATS HERO ══════════ -->
+  <div class="stats-hero">
+    <div class="stats-hero-inner">
+      <div class="greeting-block">
+        <p class="greeting-label">Administration</p>
+        <h1 class="greeting-title">Utilisateurs</h1>
+        <p class="greeting-sub">{{ totalUsers }} utilisateur{{ totalUsers !== 1 ? 's' : '' }} enregistré{{ totalUsers !== 1 ? 's' : '' }}</p>
+      </div>
+    </div>
+
+    <div class="kpi-row">
+      <div class="kpi-card">
+        <span class="kpi-icon kpi-blue"><i class="bi bi-people-fill"></i></span>
+        <div>
+          <p class="kpi-value">{{ totalUsers }}</p>
+          <p class="kpi-label">Total</p>
+        </div>
+      </div>
+      <div class="kpi-card">
+        <span class="kpi-icon kpi-purple"><i class="bi bi-shield-fill"></i></span>
+        <div>
+          <p class="kpi-value">{{ totalAdmins }}</p>
+          <p class="kpi-label">Admins</p>
+        </div>
+      </div>
+      <div class="kpi-card">
+        <span class="kpi-icon kpi-orange"><i class="bi bi-award-fill"></i></span>
+        <div>
+          <p class="kpi-value">{{ totalCoaches }}</p>
+          <p class="kpi-label">Coachs</p>
+        </div>
+      </div>
+      <div class="kpi-card">
+        <span class="kpi-icon kpi-green"><i class="bi bi-person-fill"></i></span>
+        <div>
+          <p class="kpi-value">{{ totalMembers }}</p>
+          <p class="kpi-label">Membres</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════ TOOLBAR ══════════ -->
+  <div class="toolbar">
+
+    <!-- Search -->
+    <div class="search-box">
+      <i class="bi bi-search search-icon"></i>
+      <input
+        type="text"
+        class="search-input"
+        placeholder="Rechercher par nom ou email…"
+        [(ngModel)]="searchQuery"
+        (ngModelChange)="onSearch()"
+      />
+      <button class="search-clear" *ngIf="searchQuery" (click)="searchQuery=''; onSearch()">
+        <i class="bi bi-x-lg"></i>
+      </button>
+    </div>
+
+    <!-- Role filters -->
+    <div class="role-filters">
+      <button class="filter-chip" [class.active]="activeRoleFilter==='ALL'" (click)="filterByRole('ALL')">
+        <i class="bi bi-grid-3x3-gap"></i> Tous
+      </button>
+      <button class="filter-chip" [class.active]="activeRoleFilter==='ADMIN'" (click)="filterByRole('ADMIN')">
+        <i class="bi bi-shield"></i> Admins
+      </button>
+      <button class="filter-chip" [class.active]="activeRoleFilter==='COACH'" (click)="filterByRole('COACH')">
+        <i class="bi bi-award"></i> Coachs
+      </button>
+      <button class="filter-chip" [class.active]="activeRoleFilter==='USER'" (click)="filterByRole('USER')">
+        <i class="bi bi-person"></i> Membres
+      </button>
+    </div>
+
+  </div>
+
+  <!-- ══════════ LOADING ══════════ -->
+  <div class="loading-state" *ngIf="loading">
+    <div class="spinner-ring"></div>
+    <p>Chargement des utilisateurs…</p>
+  </div>
+
+  <!-- ══════════ TABLE BLOCK ══════════ -->
+  <div class="table-block" *ngIf="!loading">
+
+    <!-- Result count -->
+    <div class="table-meta">
+      <span class="result-count">
+        <strong>{{ filteredUsers.length }}</strong> résultat{{ filteredUsers.length !== 1 ? 's' : '' }}
+        <span *ngIf="searchQuery || activeRoleFilter !== 'ALL'"> trouvé{{ filteredUsers.length !== 1 ? 's' : '' }}</span>
+      </span>
+      <span class="page-info" *ngIf="totalPages > 1">
+        Page {{ currentPage }} / {{ totalPages }}
+      </span>
+    </div>
+
+    <!-- Empty state -->
+    <div class="empty-state" *ngIf="filteredUsers.length === 0">
+      <div class="empty-illustration"><i class="bi bi-person-x"></i></div>
+      <h3>Aucun utilisateur trouvé</h3>
+      <p>Modifiez vos filtres ou votre recherche.</p>
+    </div>
+
+    <!-- Table -->
+    <div class="table-wrapper" *ngIf="filteredUsers.length > 0">
+      <table class="users-table">
+        <thead>
+          <tr>
+            <th class="th-avatar"></th>
+            <th class="sortable" (click)="sortBy('displayName')">
+              <span>Nom</span>
+              <i class="bi sort-icon" [ngClass]="getSortIcon('displayName')"></i>
+            </th>
+            <th class="sortable" (click)="sortBy('email')">
+              <span>Email</span>
+              <i class="bi sort-icon" [ngClass]="getSortIcon('email')"></i>
+            </th>
+            <th class="sortable" (click)="sortBy('role')">
+              <span>Rôle</span>
+              <i class="bi sort-icon" [ngClass]="getSortIcon('role')"></i>
+            </th>
+            <th>Fuseau horaire</th>
+            <th class="sortable" (click)="sortBy('createdAt')">
+              <span>Inscription</span>
+              <i class="bi sort-icon" [ngClass]="getSortIcon('createdAt')"></i>
+            </th>
+            <th class="th-actions">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let user of paginatedUsers" class="user-row">
+
+            <!-- Avatar -->
+            <td class="td-avatar">
+              <div class="user-avatar" [ngClass]="'avatar-' + getAvatarCls(user)">
+                <img *ngIf="user.avatarUrl" [src]="user.avatarUrl" [alt]="user.displayName" />
+                <span *ngIf="!user.avatarUrl">{{ getInitials(user) }}</span>
+              </div>
+            </td>
+
+            <!-- Name + bio -->
+            <td class="td-name">
+              <span class="user-name">{{ user.displayName || '—' }}</span>
+              <span class="user-bio" *ngIf="user.bio">{{ user.bio }}</span>
+            </td>
+
+            <!-- Email -->
+            <td class="td-email">
+              <a [href]="'mailto:' + user.email" class="email-link">
+                <i class="bi bi-envelope"></i>
+                {{ user.email }}
+              </a>
+            </td>
+
+            <!-- Role badge -->
+            <td class="td-role">
+              <span class="role-badge" [ngClass]="getRoleCls(user.role)">
+                <i class="bi"
+                   [ngClass]="{
+                     'bi-shield-fill': user.role === 'ADMIN',
+                     'bi-award-fill': user.role === 'COACH',
+                     'bi-person-fill': user.role === 'USER'
+                   }">
+                </i>
+                {{ getRoleLabel(user.role) }}
+              </span>
+            </td>
+
+            <!-- Timezone -->
+            <td class="td-timezone">
+              <span class="tz-chip">
+                <i class="bi bi-globe2"></i>
+                {{ user.timezone || '—' }}
+              </span>
+            </td>
+
+            <!-- Created at -->
+            <td class="td-date">
+              <span *ngIf="user.createdAt">{{ user.createdAt | date:'dd MMM yyyy' }}</span>
+              <span class="muted" *ngIf="!user.createdAt">—</span>
+            </td>
+
+            <!-- Actions -->
+            <td class="td-actions">
+              <button class="action-btn btn-del" (click)="confirmDelete(user)" title="Supprimer">
+                <i class="bi bi-trash3"></i>
+              </button>
+            </td>
+
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- ══════════ PAGINATION ══════════ -->
+    <div class="pagination" *ngIf="totalPages > 1">
+      <button class="page-btn" [disabled]="currentPage === 1" (click)="goToPage(currentPage - 1)">
+        <i class="bi bi-chevron-left"></i>
+      </button>
+
+      <ng-container *ngFor="let p of pageNumbers">
+        <button
+          class="page-btn"
+          [class.active]="p === currentPage"
+          (click)="goToPage(p)"
+          *ngIf="p === 1 || p === totalPages || (p >= currentPage - 2 && p <= currentPage + 2)">
+          {{ p }}
+        </button>
+        <span class="page-ellipsis"
+          *ngIf="(p === currentPage - 3 && p > 2) || (p === currentPage + 3 && p < totalPages - 1)">
+          …
+        </span>
+      </ng-container>
+
+      <button class="page-btn" [disabled]="currentPage === totalPages" (click)="goToPage(currentPage + 1)">
+        <i class="bi bi-chevron-right"></i>
+      </button>
+    </div>
+
+  </div>
+</section>
+
+<!-- ══════════ DELETE CONFIRM MODAL ══════════ -->
+<div class="modal-overlay" *ngIf="showDeleteConfirm" (click)="closeModalOnOverlay($event)">
+  <div class="modal-sheet" (click)="$event.stopPropagation()">
+
+    <div class="modal-head danger-head">
+      <div class="modal-head-left">
+        <span class="modal-icon danger-icon"><i class="bi bi-exclamation-triangle-fill"></i></span>
+        <h3>Supprimer l'utilisateur</h3>
+      </div>
+      <button class="modal-close" (click)="closeDeleteConfirm()">
+        <i class="bi bi-x-lg"></i>
+      </button>
+    </div>
+
+    <div class="modal-content">
+      <!-- User preview -->
+      <div class="delete-user-preview">
+        <div class="user-avatar avatar-lg" [ngClass]="'avatar-' + getAvatarCls(userToDelete!)">
+          <span>{{ getInitials(userToDelete!) }}</span>
+        </div>
+        <div>
+          <p class="delete-user-name">{{ userToDelete?.displayName }}</p>
+          <p class="delete-user-email">{{ userToDelete?.email }}</p>
+        </div>
+      </div>
+
+      <p class="delete-confirm-text">
+        Êtes-vous sûr de vouloir supprimer cet utilisateur ? Cette action est <strong>irréversible</strong>.
+      </p>
+      <p class="delete-warn">
+        <i class="bi bi-exclamation-circle"></i>
+        Toutes les données associées à ce compte seront perdues.
+      </p>
+    </div>
+
+    <div class="modal-foot">
+      <button class="btn-ghost" (click)="closeDeleteConfirm()">Annuler</button>
+      <button class="btn-danger" (click)="deleteUser()" [disabled]="deleting">
+        <i class="bi bi-hourglass-split spin-icon" *ngIf="deleting"></i>
+        <i class="bi bi-trash3-fill" *ngIf="!deleting"></i>
+        {{ deleting ? 'Suppression…' : 'Supprimer définitivement' }}
+      </button>
+    </div>
+
+  </div>
+</div>
