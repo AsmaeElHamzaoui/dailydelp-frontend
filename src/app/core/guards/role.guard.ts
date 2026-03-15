@@ -22,6 +22,6 @@ export class RoleGuard implements CanActivate {
 
     // Rediriger vers une page d'accès refusé ou d'accueil
     alert('Accès refusé. Vous n\'avez pas les permissions nécessaires.');
-    return this.router.createUrlTree(['/']);
+    return this.router.createUrlTree(['/']);                                                      
   }
 }
