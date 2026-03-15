@@ -14,7 +14,7 @@ export interface ProfileUpdateRequest {
 @Injectable({ providedIn: 'root' })
 export class UserService {
 
-  private api = `${environment.apiUrl}/api/user/profile`;
+  private api = `${environment.apiUrl}/api/profile`;
 
   constructor(private http: HttpClient) {}
 
