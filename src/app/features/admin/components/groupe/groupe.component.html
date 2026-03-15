@@ -1,0 +1,327 @@
+<section class="group-dashboard">
+
+  <!-- ══════════ STATS HERO ══════════ -->
+  <div class="stats-hero">
+    <div class="stats-hero-inner">
+      <div class="greeting-block">
+        <p class="greeting-label">Administration</p>
+        <h1 class="greeting-title">Mes Groupes</h1>
+        <p class="greeting-sub">{{ totalGroups }} groupe{{ totalGroups !== 1 ? 's' : '' }} actif{{ totalGroups !== 1 ? 's' : '' }}</p>
+      </div>
+      <button class="btn-primary-cta" (click)="openGroupModal()">
+        <i class="bi bi-plus-lg"></i>
+        Nouveau groupe
+      </button>
+    </div>
+
+    <div class="kpi-row">
+      <div class="kpi-card">
+        <span class="kpi-icon kpi-green"><i class="bi bi-people-fill"></i></span>
+        <div>
+          <p class="kpi-value">{{ totalGroups }}</p>
+          <p class="kpi-label">Groupes totaux</p>
+        </div>
+      </div>
+      <div class="kpi-card">
+        <span class="kpi-icon kpi-blue"><i class="bi bi-person-check-fill"></i></span>
+        <div>
+          <p class="kpi-value">{{ totalMembers }}</p>
+          <p class="kpi-label">Membres uniques</p>
+        </div>
+      </div>
+      <div class="kpi-card">
+        <span class="kpi-icon kpi-orange"><i class="bi bi-award-fill"></i></span>
+        <div>
+          <p class="kpi-value">{{ totalCoaches }}</p>
+          <p class="kpi-label">Coachs actifs</p>
+        </div>
+      </div>
+      <div class="kpi-card">
+        <span class="kpi-icon kpi-purple"><i class="bi bi-bar-chart-fill"></i></span>
+        <div>
+          <p class="kpi-value">{{ avgMembersPerGroup }}</p>
+          <p class="kpi-label">Moy. membres / groupe</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════ FILTERS ══════════ -->
+  <div class="filter-bar">
+    <button class="filter-chip" [class.active]="activeFilter==='ALL'" (click)="filterGroups('ALL')">
+      <i class="bi bi-grid-3x3-gap"></i> Tous
+    </button>
+    <button class="filter-chip" [class.active]="activeFilter==='LARGE'" (click)="filterGroups('LARGE')">
+      <i class="bi bi-people"></i> Grands (5+)
+    </button>
+    <button class="filter-chip" [class.active]="activeFilter==='SMALL'" (click)="filterGroups('SMALL')">
+      <i class="bi bi-person-plus"></i> Petits (&lt;5)
+    </button>
+    <button class="filter-chip" [class.active]="activeFilter==='EMPTY'" (click)="filterGroups('EMPTY')">
+      <i class="bi bi-inbox"></i> Vides
+    </button>
+  </div>
+
+  <!-- ══════════ LOADING ══════════ -->
+  <div class="loading-state" *ngIf="loading">
+    <div class="spinner-ring"></div>
+    <p>Chargement des groupes…</p>
+  </div>
+
+  <!-- ══════════ EMPTY STATE ══════════ -->
+  <div class="empty-state" *ngIf="!loading && filteredGroups.length === 0">
+    <div class="empty-illustration">
+      <i class="bi bi-people"></i>
+    </div>
+    <h3>Aucun groupe trouvé</h3>
+    <p>Commencez par créer votre premier groupe et invitez des membres.</p>
+    <button class="btn-primary-cta" (click)="openGroupModal()">
+      <i class="bi bi-plus-lg"></i> Créer mon premier groupe
+    </button>
+  </div>
+
+  <!-- ══════════ GROUP GRID ══════════ -->
+  <div class="groups-grid" *ngIf="!loading && filteredGroups.length > 0">
+    <div class="group-card" *ngFor="let group of filteredGroups">
+
+      <!-- Top accent bar -->
+      <div class="card-accent-bar" [ngClass]="'bar-' + getGroupColor(group)"></div>
+
+      <!-- Header row -->
+      <div class="card-header-row">
+        <div class="card-header-left">
+          <span class="group-avatar" [ngClass]="'avatar-' + getGroupColor(group)">
+            {{ group.name?.charAt(0)?.toUpperCase() }}
+          </span>
+        </div>
+        <div class="card-header-right">
+          <span class="size-badge" [ngClass]="getSizeCls(group)">
+            <i class="bi bi-people-fill"></i>
+            {{ getSizeLabel(group) }}
+          </span>
+        </div>
+      </div>
+
+      <!-- Body -->
+      <div class="card-body">
+        <h3 class="group-name">{{ group.name }}</h3>
+        <p class="group-desc" *ngIf="group.description">{{ group.description }}</p>
+
+        <!-- Coach row -->
+        <div class="coach-row">
+          <span class="coach-label"><i class="bi bi-award"></i> Coach</span>
+          <div class="coach-info">
+            <span class="coach-avatar" [ngClass]="'avatar-' + getGroupColor(group)">
+              {{ getInitials(group.coach) }}
+            </span>
+            <span class="coach-name">{{ getCoachName(group) }}</span>
+          </div>
+        </div>
+
+        <!-- Members avatars + noms -->
+        <div class="members-section">
+          <span class="members-label">
+            <i class="bi bi-people"></i>
+            {{ group.members?.length ?? 0 }} membre{{ (group.members?.length ?? 0) !== 1 ? 's' : '' }}
+          </span>
+
+          <!-- Stack avatars -->
+          <div class="avatar-stack" *ngIf="(group.members?.length ?? 0) > 0">
+            <div
+              class="avatar-chip"
+              *ngFor="let m of getMembersPreview(group)"
+              [ngClass]="'avatar-' + getGroupColor(group)"
+              [title]="getMemberDisplayName(m)">
+              {{ getInitials(m) }}
+            </div>
+            <div class="avatar-chip avatar-overflow" *ngIf="getMembersOverflow(group) > 0">
+              +{{ getMembersOverflow(group) }}
+            </div>
+          </div>
+
+          <!-- Liste des noms si ≤ 4 membres -->
+          <div class="members-names-list" *ngIf="(group.members?.length ?? 0) > 0 && (group.members?.length ?? 0) <= 4">
+            <span class="member-name-tag" *ngFor="let m of group.members">
+              {{ getMemberDisplayName(m) }}
+            </span>
+          </div>
+
+          <span class="no-members" *ngIf="(group.members?.length ?? 0) === 0">
+            <i class="bi bi-person-plus"></i> Aucun membre
+          </span>
+        </div>
+
+        <!-- Date de création -->
+        <div class="group-meta" *ngIf="group.createdAt">
+          <span class="meta-chip">
+            <i class="bi bi-calendar3"></i>
+            Créé le {{ group.createdAt | date:'dd MMM yyyy' }}
+          </span>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="card-actions">
+        <button class="action-btn btn-view" title="Voir les détails">
+          <i class="bi bi-eye"></i>
+        </button>
+        <button class="action-btn btn-edit flex-1" (click)="editGroup(group)" title="Modifier">
+          <i class="bi bi-pencil"></i>
+          <span>Modifier</span>
+        </button>
+        <button class="action-btn btn-del" (click)="confirmDelete(group)" title="Supprimer">
+          <i class="bi bi-trash3"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+</section>
+
+<!-- ══════════ GROUP MODAL ══════════ -->
+<div class="modal-overlay" *ngIf="showGroupModal" (click)="closeModalOnOverlay($event, 'group')">
+  <div class="modal-sheet" (click)="$event.stopPropagation()">
+
+    <div class="modal-head">
+      <div class="modal-head-left">
+        <span class="modal-icon">
+          <i class="bi" [ngClass]="isEditing ? 'bi-pencil-square' : 'bi-plus-circle'"></i>
+        </span>
+        <div>
+          <h3>{{ isEditing ? 'Modifier le groupe' : 'Nouveau groupe' }}</h3>
+          <p class="modal-subtitle">
+            {{ isEditing
+              ? 'Mettez à jour les informations du groupe'
+              : 'Remplissez les informations pour créer un groupe' }}
+          </p>
+        </div>
+      </div>
+      <button class="modal-close" (click)="closeGroupModal()"><i class="bi bi-x-lg"></i></button>
+    </div>
+
+    <div class="modal-content">
+
+      <!-- Nom -->
+      <div class="field-group">
+        <label class="field-label">Nom du groupe <span class="req">*</span></label>
+        <input
+          type="text"
+          [(ngModel)]="groupForm.name"
+          class="field-input"
+          [class.field-error]="formErrors.name"
+          placeholder="Ex : Équipe Cardio Avancé"
+        />
+        <span class="field-err-msg" *ngIf="formErrors.name">Le nom est requis</span>
+      </div>
+
+      <!-- Description -->
+      <div class="field-group">
+        <label class="field-label">Description <span class="optional">(optionnel)</span></label>
+        <textarea
+          [(ngModel)]="groupForm.description"
+          class="field-input"
+          rows="3"
+          placeholder="Décrivez l'objectif et le fonctionnement du groupe…"
+        ></textarea>
+      </div>
+
+      <!-- Coach -->
+      <div class="field-group">
+        <label class="field-label">Coach responsable <span class="req">*</span></label>
+        <select
+          [(ngModel)]="groupForm.coachId"
+          class="field-input"
+          [class.field-error]="formErrors.coachId"
+        >
+          <option [ngValue]="undefined">— Sélectionner un coach —</option>
+          <option *ngFor="let coach of coaches" [ngValue]="coach.id">
+            {{ coach.displayName?.trim() || coach.email }}
+          </option>
+        </select>
+        <span class="field-err-msg" *ngIf="formErrors.coachId">Un coach est requis</span>
+      </div>
+
+      <!-- Members multi-select -->
+      <div class="field-group">
+        <label class="field-label">
+          Membres
+          <span class="optional">
+            ({{ selectedMemberIds.length }} sélectionné{{ selectedMemberIds.length !== 1 ? 's' : '' }})
+          </span>
+        </label>
+        <div class="members-select-list">
+          <div
+            class="member-select-item"
+            *ngFor="let member of members"
+            [class.selected]="isMemberSelected(member.id)"
+            (click)="toggleMember(member.id)"
+          >
+            <div class="member-select-avatar" [class.selected]="isMemberSelected(member.id)">
+              {{ getInitials(member) }}
+            </div>
+            <div class="member-select-info">
+              <span class="member-select-name">
+                {{ member.displayName?.trim() || member.email }}
+              </span>
+              <span class="member-select-email" *ngIf="member.displayName?.trim()">
+                {{ member.email }}
+              </span>
+            </div>
+            <i class="bi member-check-icon"
+               [ngClass]="isMemberSelected(member.id) ? 'bi-check-circle-fill' : 'bi-circle'">
+            </i>
+          </div>
+          <div class="no-users-msg" *ngIf="members.length === 0">
+            <i class="bi bi-person-x"></i> Aucun utilisateur disponible
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="modal-foot">
+      <button class="btn-ghost" (click)="closeGroupModal()">Annuler</button>
+      <button class="btn-primary" (click)="saveGroup()" [disabled]="saving">
+        <i class="bi bi-hourglass-split spin-icon" *ngIf="saving"></i>
+        <span>{{ saving ? 'En cours…' : (isEditing ? 'Mettre à jour' : 'Créer le groupe') }}</span>
+      </button>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════ DELETE CONFIRM ══════════ -->
+<div class="modal-overlay" *ngIf="showDeleteConfirm" (click)="closeModalOnOverlay($event, 'delete')">
+  <div class="modal-sheet modal-xs" (click)="$event.stopPropagation()">
+
+    <div class="modal-head danger-head">
+      <div class="modal-head-left">
+        <span class="modal-icon danger-icon"><i class="bi bi-exclamation-triangle-fill"></i></span>
+        <h3>Supprimer le groupe</h3>
+      </div>
+    </div>
+
+    <div class="modal-content">
+      <p class="delete-confirm-text">
+        Êtes-vous sûr de vouloir supprimer <strong>"{{ groupToDelete?.name }}"</strong> ?
+      </p>
+      <p class="delete-warn">
+        <i class="bi bi-people"></i>
+        Ce groupe contient
+        {{ groupToDelete?.members?.length ?? 0 }}
+        membre{{ (groupToDelete?.members?.length ?? 0) !== 1 ? 's' : '' }}.
+        Cette action est irréversible.
+      </p>
+    </div>
+
+    <div class="modal-foot">
+      <button class="btn-ghost" (click)="closeDeleteConfirm()">Annuler</button>
+      <button class="btn-danger" (click)="deleteGroup()" [disabled]="deleting">
+        <i class="bi bi-hourglass-split spin-icon" *ngIf="deleting"></i>
+        <i class="bi bi-trash3-fill" *ngIf="!deleting"></i>
+        {{ deleting ? 'Suppression…' : 'Supprimer définitivement' }}
+      </button>
+    </div>
+
+  </div>
+</div>
