@@ -1,0 +1,251 @@
+<section class="analytics-dashboard">
+
+  <!-- ══════════ HERO ══════════ -->
+  <div class="an-hero">
+    <div class="an-hero-deco">
+      <span class="deco-blob b1"></span>
+      <span class="deco-blob b2"></span>
+      <span class="deco-blob b3"></span>
+    </div>
+    <div class="an-hero-content">
+      <div class="an-hero-left">
+        <p class="an-eyebrow"><i class="bi bi-graph-up-arrow"></i> Tableau de bord analytique</p>
+        <h1 class="an-title">Analytics</h1>
+        <p class="an-sub">Vue complète et dynamique de la plateforme en temps réel</p>
+      </div>
+      <button class="hero-refresh-btn" (click)="loadAll()" [disabled]="loading">
+        <i class="bi" [ngClass]="loading ? 'bi-hourglass-split spin' : 'bi-arrow-clockwise'"></i>
+        Actualiser
+      </button>
+    </div>
+  </div>
+
+  <!-- ══════════ LOADING ══════════ -->
+  <div class="an-loading" *ngIf="loading">
+    <div class="an-loader">
+      <span></span><span></span><span></span><span></span>
+    </div>
+    <p>Chargement des données de la plateforme…</p>
+  </div>
+
+  <ng-container *ngIf="!loading">
+
+    <!-- ══════════ KPI CARDS ══════════ -->
+    <div class="kpi-grid">
+      <div class="kpi-card" *ngFor="let kpi of kpis; let i = index" [style.--i]="i">
+        <div class="kpi-top">
+          <div class="kpi-icon-wrap" [ngClass]="kpi.colorCls">
+            <i class="bi" [ngClass]="kpi.icon"></i>
+          </div>
+          <span class="kpi-trend" [class.up]="kpi.trendUp" [class.neutral]="!kpi.trendUp">
+            <i class="bi" [ngClass]="kpi.trendUp ? 'bi-arrow-up-right' : 'bi-dash'"></i>
+            {{ kpi.trend }}
+          </span>
+        </div>
+        <p class="kpi-value">{{ kpi.value }}</p>
+        <p class="kpi-label">{{ kpi.label }}</p>
+        <p class="kpi-sub">{{ kpi.sub }}</p>
+        <div class="kpi-bar-bg">
+          <div class="kpi-bar-fill" [ngClass]="kpi.colorCls" [style.width.%]="kpi.progress"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════ ROW 1 : Charts ══════════ -->
+    <div class="charts-row">
+
+      <!-- Activity bar chart -->
+      <div class="an-card chart-wide">
+        <div class="an-card-head">
+          <div class="an-card-title-block">
+            <span class="an-card-icon icon-amber"><i class="bi bi-bar-chart-line-fill"></i></span>
+            <div>
+              <h3>Publications par mois</h3>
+              <p>Activité sur les 6 derniers mois</p>
+            </div>
+          </div>
+          <span class="total-badge">
+            {{ posts.length }} au total
+          </span>
+        </div>
+        <div class="chart-area">
+          <canvas #activityChart></canvas>
+        </div>
+      </div>
+
+      <!-- Role doughnut -->
+      <div class="an-card chart-narrow">
+        <div class="an-card-head">
+          <div class="an-card-title-block">
+            <span class="an-card-icon icon-violet"><i class="bi bi-pie-chart-fill"></i></span>
+            <div>
+              <h3>Répartition des rôles</h3>
+              <p>{{ users.length }} utilisateurs</p>
+            </div>
+          </div>
+        </div>
+        <div class="chart-area chart-donut">
+          <canvas #roleChart></canvas>
+        </div>
+        <!-- Role bars -->
+        <div class="role-bars">
+          <div class="role-bar-item" *ngFor="let r of roleDistribution">
+            <div class="role-bar-header">
+              <span class="role-bar-label">{{ r.label }}</span>
+              <span class="role-bar-count">{{ r.count }} <small>({{ r.pct }}%)</small></span>
+            </div>
+            <div class="role-bar-track">
+              <div class="role-bar-fill" [ngClass]="r.colorCls" [style.width.%]="r.pct"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ══════════ ROW 2 : Group size + insight cards ══════════ -->
+    <div class="charts-row row2">
+
+      <!-- Group size horizontal bar -->
+      <div class="an-card chart-medium">
+        <div class="an-card-head">
+          <div class="an-card-title-block">
+            <span class="an-card-icon icon-green"><i class="bi bi-collection-fill"></i></span>
+            <div>
+              <h3>Taille des groupes</h3>
+              <p>Distribution par nombre de membres</p>
+            </div>
+          </div>
+          <span class="total-badge">{{ groups.length }} groupes</span>
+        </div>
+        <div class="chart-area chart-hbar">
+          <canvas #groupSizeChart></canvas>
+        </div>
+      </div>
+
+      <!-- Insight cards stack -->
+      <div class="insight-stack">
+
+        <!-- Most active coach -->
+        <div class="insight-card">
+          <div class="insight-icon icon-amber"><i class="bi bi-award-fill"></i></div>
+          <div class="insight-body">
+            <p class="insight-label">Coach le plus actif</p>
+            <p class="insight-value">{{ mostActiveCoach }}</p>
+            <p class="insight-meta">{{ mostActiveCoachPosts }} publication{{ mostActiveCoachPosts > 1 ? 's' : '' }}</p>
+          </div>
+        </div>
+
+        <!-- Largest group -->
+        <div class="insight-card">
+          <div class="insight-icon icon-green"><i class="bi bi-people-fill"></i></div>
+          <div class="insight-body">
+            <p class="insight-label">Groupe le plus grand</p>
+            <p class="insight-value">{{ largestGroup }}</p>
+            <p class="insight-meta">{{ largestGroupSize }} membre{{ largestGroupSize > 1 ? 's' : '' }}</p>
+          </div>
+        </div>
+
+        <!-- Avg post length -->
+        <div class="insight-card">
+          <div class="insight-icon icon-blue"><i class="bi bi-textarea-t"></i></div>
+          <div class="insight-body">
+            <p class="insight-label">Longueur moy. des posts</p>
+            <p class="insight-value">{{ avgPostLength }} <small>car.</small></p>
+            <p class="insight-meta">{{ postsWithImage }} avec image · {{ postsTextOnly }} texte seul</p>
+          </div>
+        </div>
+
+        <!-- Empty groups -->
+        <div class="insight-card" [class.warn]="emptyGroupsCount > 0">
+          <div class="insight-icon" [class.icon-rose]="emptyGroupsCount > 0" [class.icon-green]="emptyGroupsCount === 0">
+            <i class="bi" [ngClass]="emptyGroupsCount > 0 ? 'bi-exclamation-triangle-fill' : 'bi-check-circle-fill'"></i>
+          </div>
+          <div class="insight-body">
+            <p class="insight-label">Groupes vides</p>
+            <p class="insight-value">{{ emptyGroupsCount }}</p>
+            <p class="insight-meta">sur {{ groups.length }} groupe{{ groups.length > 1 ? 's' : '' }} au total</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ══════════ TOP GROUPS TABLE ══════════ -->
+    <div class="an-card top-groups-card">
+      <div class="an-card-head">
+        <div class="an-card-title-block">
+          <span class="an-card-icon icon-blue"><i class="bi bi-trophy-fill"></i></span>
+          <div>
+            <h3>Top 5 groupes par membres</h3>
+            <p>Classement par taille de groupe</p>
+          </div>
+        </div>
+      </div>
+      <div class="top-groups-list">
+        <div class="tg-row" *ngFor="let g of topGroups; let i = index">
+          <span class="tg-rank" [ngClass]="'rank-' + (i + 1)">{{ i + 1 }}</span>
+          <div class="tg-info">
+            <span class="tg-name">{{ g.name }}</span>
+            <span class="tg-coach"><i class="bi bi-award"></i> {{ g.coachName }}</span>
+          </div>
+          <div class="tg-bar-wrap">
+            <div class="tg-bar-track">
+              <div class="tg-bar-fill" [style.width.%]="g.pct" [style.--rank]="i + 1"></div>
+            </div>
+            <span class="tg-count">{{ g.memberCount }} membre{{ g.memberCount > 1 ? 's' : '' }}</span>
+          </div>
+        </div>
+        <div class="tg-empty" *ngIf="topGroups.length === 0">
+          <i class="bi bi-inbox"></i> Aucun groupe disponible
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════ POSTS MEDIA BREAKDOWN ══════════ -->
+    <div class="media-strip">
+      <div class="media-item">
+        <div class="media-icon img-icon"><i class="bi bi-image-fill"></i></div>
+        <div>
+          <p class="media-val">{{ postsWithImage }}</p>
+          <p class="media-lbl">Posts avec image</p>
+        </div>
+        <div class="media-pct">
+          {{ posts.length > 0 ? (postsWithImage / posts.length * 100 | number:'1.0-0') : 0 }}%
+        </div>
+      </div>
+      <div class="media-divider"></div>
+      <div class="media-item">
+        <div class="media-icon txt-icon"><i class="bi bi-file-text-fill"></i></div>
+        <div>
+          <p class="media-val">{{ postsTextOnly }}</p>
+          <p class="media-lbl">Posts texte seul</p>
+        </div>
+        <div class="media-pct">
+          {{ posts.length > 0 ? (postsTextOnly / posts.length * 100 | number:'1.0-0') : 0 }}%
+        </div>
+      </div>
+      <div class="media-divider"></div>
+      <div class="media-item">
+        <div class="media-icon coach-icon"><i class="bi bi-person-fill-check"></i></div>
+        <div>
+          <p class="media-val">{{ uniqueCoaches }}</p>
+          <p class="media-lbl">Coachs actifs (posts)</p>
+        </div>
+        <div class="media-pct">
+          {{ users.length > 0 ? (uniqueCoaches / users.length * 100 | number:'1.0-0') : 0 }}%
+        </div>
+      </div>
+      <div class="media-divider"></div>
+      <div class="media-item">
+        <div class="media-icon avg-icon"><i class="bi bi-speedometer2"></i></div>
+        <div>
+          <p class="media-val">{{ avgPostLength }}</p>
+          <p class="media-lbl">Moy. caractères / post</p>
+        </div>
+        <div class="media-pct">car.</div>
+      </div>
+    </div>
+
+  </ng-container>
+</section>
