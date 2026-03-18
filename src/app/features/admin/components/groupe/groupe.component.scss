@@ -142,6 +142,156 @@ $colors: (
 .kpi-label { font-size: .72rem; opacity: .7; margin: 3px 0 0; }
 
 // ============================================================
+// PENDING REQUESTS SECTION
+// ============================================================
+.pending-requests-section {
+  background: #fff;
+  border: 2px solid $accent-soft;
+  border-radius: 20px;
+  padding: 24px;
+  margin-bottom: 32px;
+  box-shadow: $shadow-card;
+}
+
+.section-header {
+  margin-bottom: 20px;
+  .header-content {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+  }
+}
+
+.section-icon {
+  font-size: 1.8rem;
+  color: $primary;
+  background: $accent-soft;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+}
+
+.section-title {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: $text;
+  margin: 0;
+}
+
+.section-subtitle {
+  font-size: 0.85rem;
+  color: $muted;
+  margin: 2px 0 0;
+}
+
+.requests-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 16px;
+}
+
+.request-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: $surface;
+  border: 1px solid $border;
+  border-radius: 16px;
+  padding: 16px;
+  gap: 12px;
+  transition: $transition;
+
+  &:hover {
+    border-color: $accent;
+    transform: translateX(4px);
+  }
+}
+
+.request-user {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.user-avatar {
+  width: 36px;
+  height: 36px;
+  background: $primary;
+  color: #fff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.user-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.user-name {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: $text;
+}
+
+.request-date {
+  font-size: 0.75rem;
+  color: $muted;
+}
+
+.request-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: $muted;
+  font-size: 0.85rem;
+  
+  i { font-size: 1rem; color: $accent; }
+  .group-target { font-weight: 600; color: $primary-lt; }
+}
+
+.request-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-action {
+  padding: 8px 12px;
+  border-radius: 10px;
+  border: none;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: $transition;
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+.btn-accept {
+  background: $primary;
+  color: #fff;
+  &:hover:not(:disabled) { background: $primary-lt; }
+}
+
+.btn-refuse {
+  background: $danger-soft;
+  color: $danger;
+  &:hover:not(:disabled) { background: $danger; color: #fff; }
+}
+
+// ============================================================
 // FILTER BAR
 // ============================================================
 .filter-bar {
@@ -328,6 +478,7 @@ $colors: (
   line-height: 1.55;
   display: -webkit-box;
   -webkit-line-clamp: 2;
+  line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }

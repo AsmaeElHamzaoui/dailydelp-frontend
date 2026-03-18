@@ -1,0 +1,116 @@
+<section class="inscriptions-dashboard">
+
+  <!-- ══════════ STATS HERO ══════════ -->
+  <div class="stats-hero">
+    <div class="stats-hero-inner">
+      <div class="greeting-block">
+        <h1 class="greeting-title">Mes Inscriptions</h1>
+        <p class="greeting-sub">{{ totalRequests }} demande{{ totalRequests !== 1 ? 's' : '' }} au total</p>
+      </div>
+      <a routerLink="/user/groups" class="btn-primary-cta">
+        <i class="bi bi-plus-lg"></i> Rejoindre un groupe
+      </a>
+    </div>
+
+    <div class="kpi-row">
+      <div class="kpi-card">
+        <span class="kpi-icon kpi-blue"><i class="bi bi-list-task"></i></span>
+        <div>
+          <p class="kpi-value">{{ totalRequests }}</p>
+          <p class="kpi-label">Total</p>
+        </div>
+      </div>
+      <div class="kpi-card">
+        <span class="kpi-icon kpi-orange"><i class="bi bi-hourglass-split"></i></span>
+        <div>
+          <p class="kpi-value">{{ pendingCount }}</p>
+          <p class="kpi-label">En attente</p>
+        </div>
+      </div>
+      <div class="kpi-card">
+        <span class="kpi-icon kpi-green"><i class="bi bi-check2-circle"></i></span>
+        <div>
+          <p class="kpi-value">{{ acceptedCount }}</p>
+          <p class="kpi-label">Acceptées</p>
+        </div>
+      </div>
+      <div class="kpi-card">
+        <span class="kpi-icon kpi-purple"><i class="bi bi-x-circle"></i></span>
+        <div>
+          <p class="kpi-value">{{ refusedCount }}</p>
+          <p class="kpi-label">Refusées</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════ FILTERS ══════════ -->
+  <div class="filter-bar">
+    <button class="filter-chip" [class.active]="activeFilter==='ALL'"      (click)="filterInscriptions('ALL')">Toutes</button>
+    <button class="filter-chip" [class.active]="activeFilter==='PENDING'"  (click)="filterInscriptions('PENDING')"><i class="bi bi-hourglass-split"></i> En attente</button>
+    <button class="filter-chip" [class.active]="activeFilter==='ACCEPTEE'" (click)="filterInscriptions('ACCEPTEE')"><i class="bi bi-check-circle"></i> Acceptées</button>
+    <button class="filter-chip" [class.active]="activeFilter==='REFUSEE'"  (click)="filterInscriptions('REFUSEE')"><i class="bi bi-x-circle"></i> Refusées</button>
+  </div>
+
+  <!-- ══════════ LOADING ══════════ -->
+  <div class="loading-state" *ngIf="loading">
+    <div class="spinner-ring"></div>
+    <p>Chargement de vos demandes…</p>
+  </div>
+
+  <!-- ══════════ EMPTY STATE ══════════ -->
+  <div class="empty-state" *ngIf="!loading && filteredInscriptions.length === 0">
+    <div class="empty-illustration">
+      <i class="bi bi-journal-x"></i>
+    </div>
+    <h3>Aucune demande trouvée</h3>
+    <p>Vous n'avez aucune demande d'inscription correspondant à ce filtre.</p>
+    <a routerLink="/user/groups" class="btn-primary" *ngIf="activeFilter === 'ALL'">
+      Voir les groupes disponibles
+    </a>
+  </div>
+
+  <!-- ══════════ INSCRIPTIONS GRID ══════════ -->
+  <div class="inscriptions-grid" *ngIf="!loading && filteredInscriptions.length > 0">
+
+    <div class="inscription-card" *ngFor="let ins of filteredInscriptions">
+
+      <!-- Card top accent bar -->
+      <div class="card-accent-bar" [ngClass]="'bar-' + getStatusConfig(ins.status).cls"></div>
+
+      <!-- Header row -->
+      <div class="card-header-row">
+        <span class="status-badge" [ngClass]="'badge-' + getStatusConfig(ins.status).cls">
+          <i class="bi" [ngClass]="getStatusConfig(ins.status).icon"></i>
+          {{ getStatusConfig(ins.status).label }}
+        </span>
+        <div class="card-header-right">
+          <span class="date-label">le {{ ins.createdAt | date:'dd/MM/yyyy' }}</span>
+        </div>
+      </div>
+
+      <!-- Body -->
+      <div class="card-body">
+        <h3 class="group-name">{{ ins.groupName }}</h3>
+        
+        <div class="group-meta">
+          <span class="meta-chip"><i class="bi bi-people"></i> Groupe public</span>
+        </div>
+
+        <p class="card-desc">
+          Votre demande est actuellement en cours de traitement par l'administrateur du groupe.
+        </p>
+      </div>
+
+      <!-- Actions -->
+      <div class="card-actions" *ngIf="ins.status === 'ACCEPTEE'">
+        <button class="action-btn btn-access" routerLink="/user/groups">
+          <i class="bi bi-box-arrow-in-right"></i>
+          <span>Accéder au groupe</span>
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+</section>

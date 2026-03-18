@@ -6,7 +6,8 @@
       <div class="greeting-block">
         <p class="greeting-label">Administration</p>
         <h1 class="greeting-title">Mes Groupes</h1>
-        <p class="greeting-sub">{{ totalGroups }} groupe{{ totalGroups !== 1 ? 's' : '' }} actif{{ totalGroups !== 1 ? 's' : '' }}</p>
+        <p class="greeting-sub">{{ totalGroups }} groupe{{ totalGroups !== 1 ? 's' : '' }} actif{{ totalGroups !== 1 ?
+          's' : '' }}</p>
       </div>
       <button class="btn-primary-cta" (click)="openGroupModal()">
         <i class="bi bi-plus-lg"></i>
@@ -41,6 +42,47 @@
         <div>
           <p class="kpi-value">{{ avgMembersPerGroup }}</p>
           <p class="kpi-label">Moy. membres / groupe</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════ PENDING REQUESTS SECTION ══════════ -->
+  <div class="pending-requests-section" *ngIf="pendingInscriptions.length > 0">
+    <div class="section-header">
+      <div class="header-content">
+        <i class="bi bi-person-plus-fill section-icon"></i>
+        <div>
+          <h2 class="section-title">Demandes d'inscription en attente</h2>
+          <p class="section-subtitle">Vous avez {{ pendingInscriptions.length }} demande{{ pendingInscriptions.length >
+            1 ? 's' : '' }} à traiter</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="requests-grid">
+      <div class="request-card" *ngFor="let ins of pendingInscriptions">
+        <div class="request-user">
+          <div class="user-avatar">{{ getInitialsFromName(ins.userName) }}</div>
+          <div class="user-info">
+            <span class="user-name">{{ ins.userName }}</span>
+            <span class="request-date">le {{ ins.createdAt | date:'dd/MM/yyyy' }}</span>
+          </div>
+        </div>
+        <div class="request-group">
+          <i class="bi bi-arrow-right"></i>
+          <span class="group-target">{{ ins.groupName }}</span>
+        </div>
+        <div class="request-actions">
+          <button class="btn-action btn-accept" (click)="acceptInscription(ins)" [disabled]="processingId === ins.id">
+            <i class="bi bi-check-lg" *ngIf="processingId !== ins.id"></i>
+            <i class="bi bi-hourglass-split spin-icon" *ngIf="processingId === ins.id"></i>
+            Accepter
+          </button>
+          <button class="btn-action btn-refuse" (click)="refuseInscription(ins)" [disabled]="processingId === ins.id">
+            <i class="bi bi-x-lg"></i>
+            Refuser
+          </button>
         </div>
       </div>
     </div>
@@ -127,11 +169,8 @@
 
           <!-- Stack avatars -->
           <div class="avatar-stack" *ngIf="(group.members?.length ?? 0) > 0">
-            <div
-              class="avatar-chip"
-              *ngFor="let m of getMembersPreview(group)"
-              [ngClass]="'avatar-' + getGroupColor(group)"
-              [title]="getMemberDisplayName(m)">
+            <div class="avatar-chip" *ngFor="let m of getMembersPreview(group)"
+              [ngClass]="'avatar-' + getGroupColor(group)" [title]="getMemberDisplayName(m)">
               {{ getInitials(m) }}
             </div>
             <div class="avatar-chip avatar-overflow" *ngIf="getMembersOverflow(group) > 0">
@@ -191,8 +230,8 @@
           <h3>{{ isEditing ? 'Modifier le groupe' : 'Nouveau groupe' }}</h3>
           <p class="modal-subtitle">
             {{ isEditing
-              ? 'Mettez à jour les informations du groupe'
-              : 'Remplissez les informations pour créer un groupe' }}
+            ? 'Mettez à jour les informations du groupe'
+            : 'Remplissez les informations pour créer un groupe' }}
           </p>
         </div>
       </div>
@@ -204,35 +243,22 @@
       <!-- Nom -->
       <div class="field-group">
         <label class="field-label">Nom du groupe <span class="req">*</span></label>
-        <input
-          type="text"
-          [(ngModel)]="groupForm.name"
-          class="field-input"
-          [class.field-error]="formErrors.name"
-          placeholder="Ex : Équipe Cardio Avancé"
-        />
+        <input type="text" [(ngModel)]="groupForm.name" class="field-input" [class.field-error]="formErrors.name"
+          placeholder="Ex : Équipe Cardio Avancé" />
         <span class="field-err-msg" *ngIf="formErrors.name">Le nom est requis</span>
       </div>
 
       <!-- Description -->
       <div class="field-group">
         <label class="field-label">Description <span class="optional">(optionnel)</span></label>
-        <textarea
-          [(ngModel)]="groupForm.description"
-          class="field-input"
-          rows="3"
-          placeholder="Décrivez l'objectif et le fonctionnement du groupe…"
-        ></textarea>
+        <textarea [(ngModel)]="groupForm.description" class="field-input" rows="3"
+          placeholder="Décrivez l'objectif et le fonctionnement du groupe…"></textarea>
       </div>
 
       <!-- Coach -->
       <div class="field-group">
         <label class="field-label">Coach responsable <span class="req">*</span></label>
-        <select
-          [(ngModel)]="groupForm.coachId"
-          class="field-input"
-          [class.field-error]="formErrors.coachId"
-        >
+        <select [(ngModel)]="groupForm.coachId" class="field-input" [class.field-error]="formErrors.coachId">
           <option [ngValue]="undefined">— Sélectionner un coach —</option>
           <option *ngFor="let coach of coaches" [ngValue]="coach.id">
             {{ coach.displayName?.trim() || coach.email }}
@@ -250,12 +276,8 @@
           </span>
         </label>
         <div class="members-select-list">
-          <div
-            class="member-select-item"
-            *ngFor="let member of members"
-            [class.selected]="isMemberSelected(member.id)"
-            (click)="toggleMember(member.id)"
-          >
+          <div class="member-select-item" *ngFor="let member of members" [class.selected]="isMemberSelected(member.id)"
+            (click)="toggleMember(member.id)">
             <div class="member-select-avatar" [class.selected]="isMemberSelected(member.id)">
               {{ getInitials(member) }}
             </div>
@@ -268,7 +290,7 @@
               </span>
             </div>
             <i class="bi member-check-icon"
-               [ngClass]="isMemberSelected(member.id) ? 'bi-check-circle-fill' : 'bi-circle'">
+              [ngClass]="isMemberSelected(member.id) ? 'bi-check-circle-fill' : 'bi-circle'">
             </i>
           </div>
           <div class="no-users-msg" *ngIf="members.length === 0">

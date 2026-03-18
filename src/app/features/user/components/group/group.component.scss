@@ -1,0 +1,323 @@
+// ============================================================
+// VARIABLES & MIXINS
+// ============================================================
+$primary:       #324C40;
+$primary-lt:    #547D54;
+$accent:        #9EAD84;
+$accent-soft:   #e8efe0;
+$border:        #dde8d8;
+$white:         #ffffff;
+$surface:       #f9fbf7;
+$text:          #2c2c2c;
+$muted:         #7a8a7a;
+$success:       #1e7e46;
+$warning:       #f39c12;
+$radius-card:   20px;
+$radius-btn:    12px;
+$shadow-card:   0 4px 20px rgba(50,76,64,0.08);
+$shadow-hover:  0 12px 40px rgba(50,76,64,0.15);
+$transition:    all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-5px); }
+  100% { transform: translateY(0px); }
+}
+
+// ============================================================
+// CONTAINER & HERO
+// ============================================================
+.group-container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: 'Outfit', 'DM Sans', sans-serif;
+}
+
+.group-hero {
+  background: linear-gradient(135deg, $primary 0%, $primary-lt 100%);
+  border-radius: 24px;
+  padding: 40px;
+  margin-bottom: 40px;
+  color: $white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: -50px;
+    right: -50px;
+    width: 200px;
+    height: 200px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 50%;
+  }
+
+  .hero-title {
+    font-size: 2.2rem;
+    font-weight: 800;
+    margin: 0 0 8px;
+    letter-spacing: -0.5px;
+  }
+
+  .hero-subtitle {
+    font-size: 1.1rem;
+    opacity: 0.9;
+    margin: 0;
+    max-width: 500px;
+  }
+
+  .hero-badge {
+    background: rgba(255,255,255,0.15);
+    backdrop-filter: blur(10px);
+    padding: 12px 20px;
+    border-radius: 50px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 600;
+    border: 1px solid rgba(255,255,255,0.2);
+  }
+}
+
+// ============================================================
+// GRID & CARDS
+// ============================================================
+.group-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 28px;
+}
+
+.group-card {
+  background: $white;
+  border: 1px solid $border;
+  border-radius: $radius-card;
+  box-shadow: $shadow-card;
+  transition: $transition;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+
+  &:hover {
+    transform: translateY(-8px);
+    box-shadow: $shadow-hover;
+    border-color: $accent;
+
+    .card-accent-bar {
+       height: 6px;
+    }
+  }
+}
+
+.card-accent-bar {
+  height: 4px;
+  background: linear-gradient(90deg, $primary-lt, $accent);
+  transition: $transition;
+}
+
+.card-header {
+  padding: 24px 24px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+
+  .group-name {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: $text;
+    margin: 0 0 6px;
+  }
+
+  .coach-badge {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.85rem;
+    color: $muted;
+    font-weight: 500;
+    
+    i { color: $accent; }
+  }
+
+  .count-pill {
+    background: $accent-soft;
+    color: $primary;
+    padding: 6px 12px;
+    border-radius: 50px;
+    font-size: 0.8rem;
+    font-weight: 700;
+
+    &.full {
+      background: #fff1f0;
+      color: #c0392b;
+    }
+  }
+}
+
+.card-body {
+  padding: 0 24px 24px;
+  flex: 1;
+
+  .group-desc {
+    font-size: 0.95rem;
+    color: $muted;
+    line-height: 1.6;
+    margin-bottom: 24px;
+    min-height: 48px;
+  }
+}
+
+// ── Progress ───────────────────────────────────────────────────
+.progress-section {
+  margin-bottom: 20px;
+
+  .progress-info {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: $muted;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .progress-track {
+    height: 8px;
+    background: $surface;
+    border-radius: 10px;
+    border: 1px solid $border;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, $primary-lt, $accent);
+    border-radius: 10px;
+    transition: width 0.6s ease-out;
+  }
+}
+
+// ── Features ───────────────────────────────────────────────────
+.group-features {
+  display: flex;
+  gap: 16px;
+  margin-top: 10px;
+
+  .feature-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: $primary-lt;
+
+    i { font-size: 1rem; }
+  }
+}
+
+// ============================================================
+// FOOTER & BUTTON
+// ============================================================
+.card-footer {
+  padding: 20px 24px 24px;
+  border-top: 1px solid rgba($border, 0.5);
+}
+
+.btn-inscription {
+  width: 100%;
+  padding: 14px;
+  border-radius: $radius-btn;
+  border: none;
+  background: $primary;
+  color: $white;
+  font-weight: 700;
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  cursor: pointer;
+  transition: $transition;
+  box-shadow: 0 4px 12px rgba($primary, 0.2);
+
+  &:hover:not(:disabled) {
+    background: $primary-lt;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba($primary, 0.3);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    background: $muted;
+    box-shadow: none;
+  }
+
+  &.success {
+    background: $success;
+    opacity: 1;
+    cursor: default;
+    box-shadow: 0 4px 12px rgba($success, 0.2);
+  }
+
+  i { font-size: 1.1rem; }
+}
+
+.spin-icon {
+  animation: spin 1s linear infinite;
+}
+
+// ============================================================
+// STATUS STATES
+// ============================================================
+.loading-state, .empty-state {
+  padding: 100px 0;
+  text-align: center;
+  color: $muted;
+
+  .spinner-ring {
+    width: 50px;
+    height: 50px;
+    border: 4px solid $accent-soft;
+    border-top-color: $primary-lt;
+    border-radius: 50%;
+    margin: 0 auto 20px;
+    animation: spin 0.8s linear infinite;
+  }
+
+  .empty-illustration {
+    font-size: 3.5rem;
+    color: $accent-soft;
+    margin-bottom: 16px;
+    animation: float 3s ease-in-out infinite;
+  }
+
+  h3 { color: $text; margin-bottom: 8px; }
+}
+
+// ============================================================
+// RESPONSIVE
+// ============================================================
+@media (max-width: 768px) {
+  .group-hero {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 20px;
+    padding: 30px;
+
+    .hero-title { font-size: 1.8rem; }
+  }
+
+  .group-grid {
+    grid-template-columns: 1fr;
+  }
+}
