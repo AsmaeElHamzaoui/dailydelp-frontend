@@ -1,0 +1,113 @@
+<app-header></app-header>
+<section class="group-container">
+
+    <!-- ══════════ HERO SECTION ══════════ -->
+    <div class="group-hero">
+        <div class="hero-content">
+            <h1 class="hero-title">Groupes d'Entraînement</h1>
+            <p class="hero-subtitle">Rejoignez un groupe et progressez ensemble avec un coach dédié.</p>
+        </div>
+        <div class="hero-badge">
+            <i class="bi bi-people-fill"></i>
+            <span>{{ groups.length }} Groupes disponibles</span>
+        </div>
+    </div>
+
+    <!-- ══════════ LOADING STATE ══════════ -->
+    <div class="loading-state" *ngIf="loading">
+        <div class="spinner-ring"></div>
+        <p>Recherche des meilleurs groupes pour vous…</p>
+    </div>
+
+    <!-- ══════════ EMPTY STATE ══════════ -->
+    <div class="empty-state" *ngIf="!loading && groups.length === 0">
+        <div class="empty-illustration">
+            <i class="bi bi-search"></i>
+        </div>
+        <h3>Aucun groupe trouvé</h3>
+        <p>Il n'y a pas encore de groupes disponibles. Revenez plus tard !</p>
+    </div>
+
+    <!-- ══════════ GROUP GRID ══════════ -->
+    <div class="group-grid" *ngIf="!loading && groups.length > 0">
+        <div class="group-card" *ngFor="let group of groups">
+
+            <!-- Top accent bar -->
+            <div class="card-accent-bar"></div>
+
+            <div class="card-header">
+                <div class="header-main">
+                    <h3 class="group-name">{{ group.name }}</h3>
+                    <span class="coach-badge">
+                        <i class="bi bi-person-badge"></i>
+                        Coach: {{ group.coachName }}
+                    </span>
+                </div>
+                <div class="member-count">
+                    <span class="count-pill" [class.full]="(group.memberIds?.length ?? 0) >= (group.maxMembers ?? 10)">
+                        {{ group.memberIds?.length ?? 0 }}/{{ group.maxMembers ?? 10 }}
+                    </span>
+                </div>
+            </div>
+
+            <div class="card-body">
+                <p class="group-desc">{{ group.description }}</p>
+
+                <div class="progress-section">
+                    <div class="progress-info">
+                        <span>Remplissage du groupe</span>
+                        <span>{{ getMemberRatio(group) }}%</span>
+                    </div>
+                    <div class="progress-track">
+                        <div class="progress-fill" [style.width.%]="getMemberRatio(group)"></div>
+                    </div>
+                </div>
+
+                <div class="group-features">
+                    <div class="feature-item">
+                        <i class="bi bi-check2-circle"></i>
+                        <span>Accès illimité</span>
+                    </div>
+                    <div class="feature-item">
+                        <i class="bi bi-shield-check"></i>
+                        <span>Suivi personnalisé</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-footer">
+                <button class="btn-inscription" [class.success]="group.requestSuccess" [disabled]="
+    group.requestLoading ||
+    group.requestSuccess ||
+    group.hasPendingOrAcceptedRequest ||
+    (group.memberIds?.length ?? 0) >= (group.maxMembers ?? 10)
+  " (click)="requestInscription(group.id)">
+
+                    <ng-container *ngIf="group.requestLoading">
+                        <i class="bi bi-hourglass-split spin-icon"></i>
+                        <span>Envoi en cours...</span>
+                    </ng-container>
+
+                    <ng-container *ngIf="!group.requestLoading && group.requestSuccess">
+                        <i class="bi bi-check-lg"></i>
+                        <span>Demande envoyée</span>
+                    </ng-container>
+
+                    <ng-container
+                        *ngIf="!group.requestLoading && !group.requestSuccess && group.hasPendingOrAcceptedRequest">
+                        <i class="bi bi-clock"></i>
+                        <span>En attente de validation</span>
+                    </ng-container>
+
+                    <ng-container
+                        *ngIf="!group.requestLoading && !group.requestSuccess && !group.hasPendingOrAcceptedRequest">
+                        <i class="bi bi-send-plus"></i>
+                        <span>Demande d'inscription</span>
+                    </ng-container>
+                </button>
+            </div>
+        </div>
+    </div>
+
+</section>
+<app-footer></app-footer>
