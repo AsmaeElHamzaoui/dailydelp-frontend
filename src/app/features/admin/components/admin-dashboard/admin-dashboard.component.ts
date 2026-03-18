@@ -10,21 +10,24 @@ import { GroupComponent } from '../groupe/groupe.component';
 import { PostComponent } from '../post/post.component';
 import { UsersComponent } from '../users/users.component';
 import { AnalyticsComponent } from '../analytics/analytics.component';
+import { InscriptionComponent } from '../inscription/inscription.component';
 
 import { UserService as ProfileService } from '../../../user/services/user.service';
 import { UserService } from '../../services/user.service';
 import { GroupService } from '../../services/group.service';
 import { PostService } from '../../services/post.service';
+import { InscriptionService } from '../../services/inscription.service';
 import { Role, User } from '../../models/user.model';
 import { PostResponse } from '../../models/post.model';
 import { GroupResponse } from '../../models/group.model';
+import { InscriptionResponse } from '../../models/inscription.model';
 
 Chart.register(...registerables);
 
 @Component({
   selector: 'app-admin-dashboard',
   standalone: true,
-  imports: [CommonModule, GroupComponent, UsersComponent, PostComponent, AnalyticsComponent],
+  imports: [CommonModule, GroupComponent, UsersComponent, PostComponent, AnalyticsComponent, InscriptionComponent],
   templateUrl: './admin-dashboard.component.html',
   styleUrls: ['./admin-dashboard.component.scss']
 })
@@ -45,6 +48,7 @@ export class AdminDashboardComponent implements OnInit, AfterViewInit, OnDestroy
   private allUsers: User[] = [];
   private allGroups: GroupResponse[] = [];
   private allPosts: PostResponse[] = [];
+  private allInscriptions: InscriptionResponse[] = [];
 
   // ── Dynamic stats cards ───────────────────────────────────────────────────
   stats: { label: string; value: string; icon: string; trend: string; isUp: boolean; progress: number }[] = [];
@@ -60,8 +64,8 @@ export class AdminDashboardComponent implements OnInit, AfterViewInit, OnDestroy
     { label: 'Users', icon: 'people', active: false },
     { label: 'Groups', icon: 'hub', active: false },
     { label: 'Posts', icon: 'article', active: false },
-    { label: 'Analytics', icon: 'insights', active: false },
-    { label: 'Settings', icon: 'settings', active: false }
+    { label: 'Inscriptions', icon: 'how_to_reg', active: false },
+    { label: 'Analytics', icon: 'insights', active: false }
   ];
   /** utilisateur connecté */
   currentUser: User | null = null;
@@ -71,6 +75,7 @@ export class AdminDashboardComponent implements OnInit, AfterViewInit, OnDestroy
     private userService: UserService,
     private groupService: GroupService,
     private postService: PostService,
+    private inscriptionService: InscriptionService,
 
   ) { }
 
@@ -106,12 +111,14 @@ export class AdminDashboardComponent implements OnInit, AfterViewInit, OnDestroy
     forkJoin({
       users: this.userService.getUsers(),
       groups: this.groupService.getGroups(),
-      posts: this.postService.getPosts()
+      posts: this.postService.getPosts(),
+      inscriptions: this.inscriptionService.getAll()
     }).subscribe({
-      next: ({ users, groups, posts }) => {
+      next: ({ users, groups, posts, inscriptions }) => {
         this.allUsers = users;
         this.allGroups = groups;
         this.allPosts = posts;
+        this.allInscriptions = inscriptions;
         this.computeStats();
         this.computeRecentUsers();
         this.dashboardLoading = false;
@@ -254,16 +261,15 @@ export class AdminDashboardComponent implements OnInit, AfterViewInit, OnDestroy
       };
     });
 
-    // Compter les users créés par mois
-    const usersByMonth = months.map(m => {
-      return this.allUsers.filter(u => u.createdAt?.slice(0, 7) === m.key).length;
+    // Compter les inscriptions par mois
+    const dataByMonth = months.map(m => {
+      return this.allInscriptions.filter(i => i.createdAt?.slice(0, 7) === m.key).length;
     });
 
-    // Si pas de date createdAt disponible → fallback valeurs croissantes fictives cohérentes
-    const hasRealUserDates = usersByMonth.some(v => v > 0);
-    const lineData = hasRealUserDates
-      ? usersByMonth
-      : [0, 0, 0, 0, 0, this.allUsers.length]; // tout dans le dernier mois
+    const hasRealData = dataByMonth.some(v => v > 0);
+    const lineData = hasRealData
+      ? dataByMonth
+      : [0, 0, 0, 0, 0, this.allInscriptions.length]; // fallback si pas de dates
 
     if (this.lineChartRef?.nativeElement) {
       this.charts.push(new Chart(this.lineChartRef.nativeElement, {

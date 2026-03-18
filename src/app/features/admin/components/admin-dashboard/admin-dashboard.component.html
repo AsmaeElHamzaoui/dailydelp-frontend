@@ -71,7 +71,6 @@
           @if (isProfileOpen()) {
           <div class="dropdown-menu">
             <a class="dropdown-item"><span class="material-icons">person_outline</span> My Profile</a>
-            <a class="dropdown-item"><span class="material-icons">settings</span> Settings</a>
             <a class="dropdown-item"><span class="material-icons">help_outline</span> Help Center</a>
             <hr>
             <a class="dropdown-item logout"><span class="material-icons">logout</span> Sign Out</a>
@@ -182,6 +181,11 @@
       <app-post></app-post>
       }
 
+      <!-- ====================== INSCRIPTIONS ==================== -->
+      @if (activeSection() === 'Inscriptions') {
+      <app-inscription></app-inscription>
+      }
+
       <!-- ====================== ANALYTICS ==================== -->
       @if (activeSection() === 'Analytics') {
       <div class="page-title">
@@ -191,26 +195,6 @@
         </div>
       </div>
       <app-analytics></app-analytics>
-      }
-
-      <!-- ======================= SETTINGS ==================== -->
-      @if (activeSection() === 'Settings') {
-      <div class="page-title">
-        <div>
-          <h1>Settings</h1>
-          <p>Platform configuration and preferences</p>
-        </div>
-      </div>
-      <div class="placeholder-section glass card">
-        <div class="placeholder-icon-wrap">
-          <span class="material-icons">settings</span>
-        </div>
-        <span class="placeholder-title">Platform Settings</span>
-        <p>The settings component will render here. Configure integrations, roles and platform behaviour.</p>
-        <button class="btn-primary">
-          <span class="material-icons">tune</span> Configure
-        </button>
-      </div>
       }
 
     </main>
