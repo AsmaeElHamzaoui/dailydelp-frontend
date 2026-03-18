@@ -38,6 +38,12 @@ import { AuthService } from '../../core/services/auth.service';
           <a class="nav-link text-white" href="#services">Services</a>
         </li>
 
+        <li class="nav-item" *ngIf="isAuthenticated && role === 'USER'">
+          <a class="nav-link text-white" routerLink="/user/groups">
+            Groupes
+          </a>
+        </li>
+
         <li class="nav-item">
           <a class="nav-link text-white" href="#contact">Contact</a>
         </li>
@@ -65,6 +71,11 @@ import { AuthService } from '../../core/services/auth.service';
             <a routerLink="/user" class="popup-item">
               <i class="bi bi-speedometer2"></i>
               Mon espace
+            </a>
+
+            <a routerLink="/user/mes-inscriptions" class="popup-item">
+              <i class="bi bi-journal-text"></i>
+              Mes inscriptions
             </a>
 
             <a routerLink="/user/profile" class="popup-item">
@@ -219,24 +230,24 @@ export class HeaderComponent {
   role: string | null = null;
   menuOpen = false;
 
-  constructor(private authService: AuthService){}
+  constructor(private authService: AuthService) { }
 
   ngOnInit(): void {
 
     this.isAuthenticated = this.authService.isLoggedIn();
     this.role = this.authService.getUserRole();
 
-    this.authService.isAuthenticated$.subscribe(status=>{
+    this.authService.isAuthenticated$.subscribe(status => {
       this.isAuthenticated = status;
       this.role = this.authService.getUserRole();
     });
   }
 
-  toggleMenu(){
+  toggleMenu() {
     this.menuOpen = !this.menuOpen;
   }
 
-  logout(){
+  logout() {
     this.authService.logout();
   }
 
