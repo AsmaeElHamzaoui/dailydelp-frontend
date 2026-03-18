@@ -1,5 +1,4 @@
 export interface InscriptionRequest {
-  userId: number;
   groupId: number;
 }
 

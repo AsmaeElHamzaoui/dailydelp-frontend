@@ -10,6 +10,7 @@ export interface GroupResponse {
   memberIds: number[];
   createdAt?: string;
   updatedAt?: string;
+  maxMembers?: number;
   // Champs enrichis côté frontend (optionnels)
   coach?: User;
   members?: User[];
