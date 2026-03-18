@@ -1,0 +1,144 @@
+<section class="inscription-dashboard">
+
+  <!-- ══════════ STATS HERO ══════════ -->
+  <div class="stats-hero">
+    <div class="stats-hero-inner">
+      <div class="greeting-block">
+        <p class="greeting-label">Administration</p>
+        <h1 class="greeting-title">Gestion des Inscriptions</h1>
+        <p class="greeting-sub">{{ totalCount }} demande{{ totalCount !== 1 ? 's' : '' }} au total</p>
+      </div>
+      <button class="btn-primary-cta" (click)="loadInscriptions()" [disabled]="loading">
+        <i class="bi bi-arrow-clockwise" [class.bi-spin]="loading"></i>
+        Actualiser
+      </button>
+    </div>
+
+    <div class="kpi-row">
+      <div class="kpi-card">
+        <span class="kpi-icon kpi-blue"><i class="bi bi-list-task"></i></span>
+        <div>
+          <p class="kpi-value">{{ totalCount }}</p>
+          <p class="kpi-label">Total</p>
+        </div>
+      </div>
+      <div class="kpi-card">
+        <span class="kpi-icon kpi-orange"><i class="bi bi-hourglass-split"></i></span>
+        <div>
+          <p class="kpi-value">{{ pendingCount }}</p>
+          <p class="kpi-label">En attente</p>
+        </div>
+      </div>
+      <div class="kpi-card">
+        <span class="kpi-icon kpi-green"><i class="bi bi-check2-circle"></i></span>
+        <div>
+          <p class="kpi-value">{{ acceptedCount }}</p>
+          <p class="kpi-label">Acceptées</p>
+        </div>
+      </div>
+      <div class="kpi-card">
+        <span class="kpi-icon kpi-purple"><i class="bi bi-x-circle"></i></span>
+        <div>
+          <p class="kpi-value">{{ refusedCount }}</p>
+          <p class="kpi-label">Refusées</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════ FILTERS ══════════ -->
+  <div class="filter-bar">
+    <button class="filter-chip" [class.active]="activeFilter==='ALL'" (click)="filterInscriptions('ALL')">
+      <i class="bi bi-grid-3x3-gap"></i> Toutes
+    </button>
+    <button class="filter-chip" [class.active]="activeFilter==='PENDING'" (click)="filterInscriptions('PENDING')">
+      <i class="bi bi-hourglass-split"></i> En attente
+    </button>
+    <button class="filter-chip" [class.active]="activeFilter==='ACCEPTEE'" (click)="filterInscriptions('ACCEPTEE')">
+      <i class="bi bi-check-circle"></i> Acceptées
+    </button>
+    <button class="filter-chip" [class.active]="activeFilter==='REFUSEE'" (click)="filterInscriptions('REFUSEE')">
+      <i class="bi bi-x-circle"></i> Refusées
+    </button>
+  </div>
+
+  <!-- ══════════ LOADING ══════════ -->
+  <div class="loading-state" *ngIf="loading">
+    <div class="spinner-ring"></div>
+    <p>Chargement des inscriptions…</p>
+  </div>
+
+  <!-- ══════════ EMPTY STATE ══════════ -->
+  <div class="empty-state" *ngIf="!loading && filteredInscriptions.length === 0">
+    <div class="empty-illustration">
+      <i class="bi bi-clipboard-x"></i>
+    </div>
+    <h3>Aucune demande trouvée</h3>
+    <p>Il n'y a aucune inscription correspondant à ce filtre.</p>
+  </div>
+
+  <!-- ══════════ INSCRIPTIONS GRID ══════════ -->
+  <div class="inscriptions-grid" *ngIf="!loading && filteredInscriptions.length > 0">
+    <div class="inscription-card" *ngFor="let ins of filteredInscriptions">
+
+      <!-- Card top accent bar -->
+      <div class="card-accent-bar" [ngClass]="'bar-' + getStatusConfig(ins.status).cls"></div>
+
+      <!-- Header row -->
+      <div class="card-header-row">
+        <div class="card-header-left">
+          <div class="user-avatar-circle" [ngClass]="'avatar-' + getStatusConfig(ins.status).cls">
+            {{ getInitials(ins.userName) }}
+          </div>
+          <div class="user-info-text">
+            <span class="user-name">{{ ins.userName }}</span>
+            <span class="request-date">le {{ ins.createdAt | date:'dd/MM/yyyy' }}</span>
+          </div>
+        </div>
+        <div class="card-header-right">
+          <span class="status-badge" [ngClass]="'badge-' + getStatusConfig(ins.status).cls">
+            <i class="bi" [ngClass]="getStatusConfig(ins.status).icon"></i>
+            {{ getStatusConfig(ins.status).label }}
+          </span>
+        </div>
+      </div>
+
+      <!-- Body -->
+      <div class="card-body">
+        <div class="target-group-box">
+          <i class="bi bi-box-arrow-in-right"></i>
+          <div>
+            <span class="label">Groupe cible</span>
+            <span class="value">{{ ins.groupName }}</span>
+          </div>
+        </div>
+
+        <p class="card-desc" *ngIf="ins.status === 'PENDING'">
+          Cette demande est en attente de validation. L'utilisateur souhaite rejoindre ce groupe.
+        </p>
+        <p class="card-desc" *ngIf="ins.status === 'ACCEPTEE'">
+          La demande a été acceptée. L'utilisateur fait maintenant partie du groupe.
+        </p>
+        <p class="card-desc" *ngIf="ins.status === 'REFUSEE'">
+          La demande a été refusée par l'administration.
+        </p>
+      </div>
+
+      <!-- Actions (seulement si Pending) -->
+      <div class="card-actions" *ngIf="ins.status === 'PENDING'">
+        <button class="action-btn btn-accept flex-1" (click)="acceptInscription(ins)"
+          [disabled]="processingId === ins.id">
+          <i class="bi bi-check-lg" *ngIf="processingId !== ins.id"></i>
+          <i class="bi bi-hourglass-split spin-icon" *ngIf="processingId === ins.id"></i>
+          Accepter
+        </button>
+        <button class="action-btn btn-refuse" (click)="refuseInscription(ins)" [disabled]="processingId === ins.id">
+          <i class="bi bi-x-lg"></i>
+          Refuser
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+</section>
