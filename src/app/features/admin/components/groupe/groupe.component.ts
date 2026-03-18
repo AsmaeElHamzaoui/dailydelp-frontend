@@ -3,7 +3,9 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { GroupService } from '../../services/group.service';
 import { UserService } from '../../services/user.service';
+import { InscriptionService } from '../../services/inscription.service';
 import { GroupResponse, GroupRequest } from '../../models/group.model';
+import { InscriptionResponse } from '../../models/inscription.model';
 import { User, Role } from '../../models/user.model';
 
 interface GroupWithMeta extends GroupResponse {
@@ -34,16 +36,19 @@ export class GroupComponent implements OnInit {
   allUsers: User[] = [];
   coaches: User[] = [];
   members: User[] = [];
+  pendingInscriptions: InscriptionResponse[] = [];
   activeFilter: string = 'ALL';
 
   // ── UI states ─────────────────────────────────────────────────────────────
   loading = false;
+  loadingInscriptions = false;
   saving = false;
   deleting = false;
   showGroupModal = false;
   isEditing = false;
   showDeleteConfirm = false;
   groupToDelete: GroupWithMeta | null = null;
+  processingId: number | null = null;
 
   // ── Forms ─────────────────────────────────────────────────────────────────
   groupForm: GroupFormModel = this.emptyGroup();
@@ -81,14 +86,30 @@ export class GroupComponent implements OnInit {
 
   constructor(
     private groupService: GroupService,
-    private userService: UserService
-  ) {}
+    private userService: UserService,
+    private inscriptionService: InscriptionService
+  ) { }
 
   ngOnInit(): void {
     this.loadUsers();
+    this.loadPendingInscriptions();
   }
 
   // ── Load ──────────────────────────────────────────────────────────────────
+  loadPendingInscriptions(): void {
+    this.loadingInscriptions = true;
+    this.inscriptionService.getAll().subscribe({
+      next: (data) => {
+        // On ne garde que les demandes PENDING
+        this.pendingInscriptions = data.filter(ins => ins.status === 'PENDING');
+        this.loadingInscriptions = false;
+      },
+      error: () => {
+        this.loadingInscriptions = false;
+      }
+    });
+  }
+
   loadUsers(): void {
     this.userService.getUsers().subscribe({
       next: (users) => {
@@ -113,6 +134,34 @@ export class GroupComponent implements OnInit {
       },
       error: () => {
         this.loading = false;
+      }
+    });
+  }
+
+  // ── Inscription Actions ───────────────────────────────────────────────────
+  acceptInscription(ins: InscriptionResponse): void {
+    this.processingId = ins.id;
+    this.inscriptionService.accept(ins.id).subscribe({
+      next: () => {
+        this.pendingInscriptions = this.pendingInscriptions.filter(i => i.id !== ins.id);
+        this.loadGroups(); // Recharger les groupes pour voir le nouveau membre
+        this.processingId = null;
+      },
+      error: () => {
+        this.processingId = null;
+      }
+    });
+  }
+
+  refuseInscription(ins: InscriptionResponse): void {
+    this.processingId = ins.id;
+    this.inscriptionService.refuse(ins.id).subscribe({
+      next: () => {
+        this.pendingInscriptions = this.pendingInscriptions.filter(i => i.id !== ins.id);
+        this.processingId = null;
+      },
+      error: () => {
+        this.processingId = null;
       }
     });
   }
@@ -311,14 +360,19 @@ export class GroupComponent implements OnInit {
 
   getInitials(user: User | undefined): string {
     if (!user) return '?';
-    const name = user.displayName?.trim();
-    if (name) {
-      const parts = name.split(' ').filter(Boolean);
+    return this.getInitialsFromName(user.displayName);
+  }
+
+  getInitialsFromName(name: string | undefined): string {
+    if (!name) return '?';
+    const trimmedName = name.trim();
+    if (trimmedName) {
+      const parts = trimmedName.split(' ').filter(Boolean);
       return parts.length >= 2
         ? (parts[0][0] + parts[parts.length - 1][0]).toUpperCase()
         : parts[0].slice(0, 2).toUpperCase();
     }
-    return (user.email ?? '??').slice(0, 2).toUpperCase();
+    return '?';
   }
 
   getSizeLabel(group: GroupWithMeta): string {
