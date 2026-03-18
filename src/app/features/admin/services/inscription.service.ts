@@ -11,29 +11,40 @@ export class InscriptionService {
 
   private apiUrl = `${environment.apiUrl}/api/inscriptions`;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
-  getInscriptions(): Observable<InscriptionResponse[]> {
+  // GET ALL INSCRIPTIONS
+  getAll(): Observable<InscriptionResponse[]> {
     return this.http.get<InscriptionResponse[]>(this.apiUrl);
   }
 
-  getInscriptionsByUser(userId: number): Observable<InscriptionResponse[]> {
+  // GET INSCRIPTION BY ID (optionnel)
+  getById(id: number): Observable<InscriptionResponse> {
+    return this.http.get<InscriptionResponse>(`${this.apiUrl}/${id}`);
+  }
+
+  // GET INSCRIPTIONS BY USER
+  getByUser(userId: number): Observable<InscriptionResponse[]> {
     return this.http.get<InscriptionResponse[]>(`${this.apiUrl}/user/${userId}`);
   }
 
-  getInscriptionsByGroup(groupId: number): Observable<InscriptionResponse[]> {
+  // GET INSCRIPTIONS BY GROUP
+  getByGroup(groupId: number): Observable<InscriptionResponse[]> {
     return this.http.get<InscriptionResponse[]>(`${this.apiUrl}/group/${groupId}`);
   }
 
-  createInscription(request: InscriptionRequest): Observable<InscriptionResponse> {
+  // CREATE INSCRIPTION
+  create(request: InscriptionRequest): Observable<InscriptionResponse> {
     return this.http.post<InscriptionResponse>(this.apiUrl, request);
   }
 
-  acceptInscription(id: number): Observable<InscriptionResponse> {
+  // ACCEPT INSCRIPTION
+  accept(id: number): Observable<InscriptionResponse> {
     return this.http.put<InscriptionResponse>(`${this.apiUrl}/${id}/accept`, {});
   }
 
-  refuseInscription(id: number): Observable<InscriptionResponse> {
+  // REFUSE INSCRIPTION
+  refuse(id: number): Observable<InscriptionResponse> {
     return this.http.put<InscriptionResponse>(`${this.apiUrl}/${id}/refuse`, {});
   }
 }
