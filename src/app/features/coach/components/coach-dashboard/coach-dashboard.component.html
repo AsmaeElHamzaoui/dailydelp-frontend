@@ -1,0 +1,295 @@
+<div class="coach-root">
+  <!-- ══════════ SIDEBAR (Admin Style) ══════════ -->
+  <aside class="sidebar" [class.collapsed]="isSidebarCollapsed">
+    <div class="sidebar-header">
+      <div class="logo">
+        <span class="material-icons logo-icon">eco</span>
+        <span class="logo-text">Hab<span>it</span></span>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <button *ngFor="let item of navItems" class="nav-item" [class.active]="activeSection === item.label"
+        (click)="setSection(item.label)">
+        <span class="material-icons">{{ item.icon }}</span>
+        <span class="nav-label">{{ item.label }}</span>
+      </button>
+
+      <button class="nav-item logout-btn" (click)="logout()">
+        <span class="material-icons">logout</span>
+        <span class="nav-label">Déconnexion</span>
+      </button>
+    </nav>
+  </aside>
+
+  <!-- ══════════ MAIN WRAPPER ══════════ -->
+  <div class="main-wrapper">
+    <header class="top-header">
+      <button class="menu-toggle" (click)="toggleSidebar()">
+        <span class="material-icons">{{ isSidebarCollapsed ? 'menu_open' : 'menu' }}</span>
+      </button>
+
+      <div class="bar-right">
+        <div class="coach-profile-mini">
+          <div class="avatar">
+            {{ (currentUser?.displayName?.[0] || 'C').toUpperCase() }}
+          </div>
+          <div class="p-info">
+            <span class="p-name">{{ currentUser?.displayName || 'Coach' }}</span>
+            <span class="p-role">Coach Certifié</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main class="dash-body" [ngSwitch]="activeSection">
+
+      <!-- ────── DASHBOARD SECTION ────── -->
+      <section *ngSwitchCase="'Dashboard'" class="section-fade">
+        <div class="page-title">
+          <div>
+            <h1>Bonjour, {{ currentUser?.displayName?.split(' ')?.[0] || 'Coach' }} !</h1>
+            <p>Voici l'aperçu de vos activités de coaching.</p>
+          </div>
+        </div>
+
+        <div class="stats-grid">
+          <div class="stat-card glass">
+            <div class="stat-main">
+              <div class="stat-info">
+                <span class="label">Groupes</span>
+                <h3 class="value">{{ myGroups.length }}</h3>
+              </div>
+              <div class="stat-icon" style="background: rgba(127,176,105,0.12); color: #3E6B50;">
+                <span class="material-icons">groups</span>
+              </div>
+            </div>
+          </div>
+          <div class="stat-card glass">
+            <div class="stat-main">
+              <div class="stat-info">
+                <span class="label">Challenges</span>
+                <h3 class="value">{{ myChallenges.length }}</h3>
+              </div>
+              <div class="stat-icon" style="background: rgba(37,99,235,0.08); color: #2563eb;">
+                <span class="material-icons">emoji_events</span>
+              </div>
+            </div>
+          </div>
+          <div class="stat-card glass">
+            <div class="stat-main">
+              <div class="stat-info">
+                <span class="label">Posts</span>
+                <h3 class="value">{{ myPosts.length }}</h3>
+              </div>
+              <div class="stat-icon" style="background: rgba(147,51,234,0.08); color: #9333ea;">
+                <span class="material-icons">forum</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card glass">
+          <div class="card-header">
+            <h3>Activité récente</h3>
+          </div>
+          <div class="empty-state" *ngIf="myPosts.length === 0">
+            <span class="material-icons">history</span>
+            <p>Aucune publication récente.</p>
+          </div>
+          <div class="recent-list" *ngIf="myPosts.length > 0">
+            <div *ngFor="let post of myPosts.slice(0, 5)" class="recent-item">
+              <span class="material-icons">edit_note</span>
+              <p>Post publié dans <strong>{{ getGroupName(post.groupId) }}</strong></p>
+              <span class="date">{{ post.createdAt | date:'short' }}</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ────── GROUPES SECTION ────── -->
+      <section *ngSwitchCase="'Groupes'" class="section-fade">
+        <div class="page-title">
+          <h1>Mes Groupes Assignés</h1>
+          <p>Groupes dont vous êtes le coach référent.</p>
+        </div>
+
+        <div class="empty-state" *ngIf="myGroups.length === 0">
+          <span class="material-icons">group_off</span>
+          <p>Aucun groupe assigné.</p>
+        </div>
+
+        <div class="items-grid" *ngIf="myGroups.length > 0">
+          <div class="item-card" *ngFor="let g of myGroups">
+            <div class="card-top">
+              <img [src]="'https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=500'" alt="Group">
+            </div>
+            <div class="card-body">
+              <h3 style="font-family: 'Sora'; margin: 0 0 10px;">{{ g.name }}</h3>
+              <p style="font-size: 0.85rem; color: #6B8577;">{{ g.description }}</p>
+            </div>
+            <div class="card-foot">
+              <span class="status-badge status-success">{{ g.members?.length || 0 }} Membres</span>
+              <button class="btn-ghost" style="padding: 6px 12px; font-size: 0.75rem;">Détails</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ────── CHALLENGES SECTION ────── -->
+      <section *ngSwitchCase="'Challenges'" class="section-fade">
+        <div class="section-header-row">
+          <div class="page-title" style="margin-bottom: 0;">
+            <h1>Gestion des Challenges</h1>
+            <p>Créez des défis stimulants pour vos membres.</p>
+          </div>
+          <button class="btn-primary" (click)="openChallengeModal()">
+            <span class="material-icons">add</span> Nouveau Challenge
+          </button>
+        </div>
+
+        <div class="empty-state" *ngIf="myChallenges.length === 0">
+          <span class="material-icons">emoji_events</span>
+          <p>Aucun challenge créé.</p>
+        </div>
+
+        <div class="items-grid" *ngIf="myChallenges.length > 0">
+          <div class="item-card" *ngFor="let c of myChallenges">
+            <div class="card-body">
+              <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+                <h3 style="font-family: 'Sora'; margin: 0;">{{ c.title }}</h3>
+                <span class="status-badge status-success">{{ getDaysRemaining(c.endDate) }} j. restants</span>
+              </div>
+              <p style="font-size: 0.85rem; color: #6B8577; min-height: 48px;">{{ c.description }}</p>
+              <div style="margin-top: 12px; font-size: 0.75rem; font-weight: 700; color: #1F3329;">
+                {{ c.startDate | date:'dd MMM' }} - {{ c.endDate | date:'dd MMM yyyy' }}
+              </div>
+            </div>
+            <div class="card-foot">
+              <span style="font-size: 0.7rem; color: #6B8577;">Visibilité: {{ c.visibility }}</span>
+              <div style="display: flex; gap: 8px;">
+                <button class="icon-btn edit" (click)="openChallengeModal(c)"><span class="material-icons">edit</span></button>
+                <button class="icon-btn delete" (click)="deleteChallenge(c.id)"><span class="material-icons">delete</span></button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ────── PUBLICATIONS SECTION ────── -->
+      <section *ngSwitchCase="'Publications'" class="section-fade">
+        <div class="section-header-row">
+          <div class="page-title" style="margin-bottom: 0;">
+            <h1>Publications</h1>
+            <p>Communiquez avec vos groupes assignés.</p>
+          </div>
+          <button class="btn-primary" (click)="openPostModal()">
+            <span class="material-icons">send</span> Créer un post
+          </button>
+        </div>
+
+        <div class="empty-state" *ngIf="myPosts.length === 0">
+          <span class="material-icons">forum</span>
+          <p>Aucune publication effectuée.</p>
+        </div>
+
+        <div class="items-grid" *ngIf="myPosts.length > 0">
+          <div class="item-card" *ngFor="let p of myPosts">
+            <div class="card-top" *ngIf="p.image">
+              <img [src]="p.image" alt="Post">
+            </div>
+            <div class="card-body">
+              <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
+                <span style="font-size: 0.7rem; font-weight: 800; color: #7FB069; text-transform: uppercase;">{{ getGroupName(p.groupId) }}</span>
+                <span style="font-size: 0.7rem; color: #6B8577;">{{ p.createdAt | date:'HH:mm' }}</span>
+              </div>
+              <p style="font-size: 0.9rem; margin: 0; line-height: 1.5;">{{ p.content }}</p>
+            </div>
+            <div class="card-foot">
+              <span style="font-size: 0.7rem; color: #6B8577;">{{ p.createdAt | date:'dd MMM yyyy' }}</span>
+              <div style="display: flex; gap: 8px;">
+                <button class="icon-btn edit" (click)="openPostModal(p)"><span class="material-icons">edit</span></button>
+                <button class="icon-btn delete" (click)="deletePost(p.id)"><span class="material-icons">delete</span></button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+</div>
+
+<!-- MODALS (Aligned with Admin style) -->
+<div class="modal-overlay" *ngIf="showChallengeModal">
+  <div class="modal-sheet">
+    <div class="modal-head">
+      <h3>{{ isEditingChallenge ? 'Modifier Challenge' : 'Nouveau Challenge' }}</h3>
+      <button class="btn-ghost" style="padding: 4px; border: none;" (click)="showChallengeModal = false">
+        <span class="material-icons">close</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label>Titre</label>
+        <input type="text" [(ngModel)]="challengeForm.title">
+      </div>
+      <div class="form-group">
+        <label>Description</label>
+        <textarea [(ngModel)]="challengeForm.description" rows="4"></textarea>
+      </div>
+      <div class="row">
+        <div class="form-group col">
+          <label>Début</label>
+          <input type="date" [(ngModel)]="challengeForm.startDate">
+        </div>
+        <div class="form-group col">
+          <label>Fin</label>
+          <input type="date" [(ngModel)]="challengeForm.endDate">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Visibilité</label>
+        <select [(ngModel)]="challengeForm.visibility">
+          <option value="PUBLIC">Public</option>
+          <option value="PRIVATE">Privé (Mes groupes)</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn-ghost" (click)="showChallengeModal = false">Annuler</button>
+      <button class="btn-primary" (click)="saveChallenge()" [disabled]="processing">Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" *ngIf="showPostModal">
+  <div class="modal-sheet">
+    <div class="modal-head">
+      <h3>{{ isEditingPost ? 'Modifier Publication' : 'Nouveau Post' }}</h3>
+      <button class="btn-ghost" style="padding: 4px; border: none;" (click)="showPostModal = false">
+        <span class="material-icons">close</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label>Groupe Cible</label>
+        <select [(ngModel)]="postForm.groupId">
+          <option *ngFor="let g of myGroups" [value]="g.id">{{ g.name }}</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Contenu</label>
+        <textarea [(ngModel)]="postForm.content" rows="6"></textarea>
+      </div>
+      <div class="form-group">
+        <label>Image URL</label>
+        <input type="text" [(ngModel)]="postForm.image">
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn-ghost" (click)="showPostModal = false">Annuler</button>
+      <button class="btn-primary" (click)="savePost()" [disabled]="processing">Publier</button>
+    </div>
+  </div>
+</div>
