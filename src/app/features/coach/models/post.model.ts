@@ -1,0 +1,16 @@
+export interface PostRequest {
+  groupId: number;
+  content: string;
+  image?: string; // optionnel car nullable côté backend
+}
+
+export interface PostResponse {
+  id: number;
+  groupId: number;
+  groupName: string;
+  coachId: number;
+  coachName: string;
+  content: string;
+  image?: string;
+  createdAt: string;
+}
