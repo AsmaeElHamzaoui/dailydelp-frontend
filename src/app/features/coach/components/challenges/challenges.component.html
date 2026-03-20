@@ -1,0 +1,186 @@
+<section class="habit-dashboard section-fade">
+
+  <!-- ══════════ STATS HERO ══════════ -->
+  <div class="stats-hero">
+    <div class="stats-hero-inner">
+      <div class="greeting-block">
+        <h1 class="greeting-title">Gestion des Challenges</h1>
+        <p class="greeting-sub">{{ totalChallenges }} challenge{{ totalChallenges !== 1 ? 's' : '' }} au total</p>
+      </div>
+      <button class="btn-primary-cta" (click)="openModal()">
+        <i class="bi bi-plus-lg"></i> Nouveau Challenge
+      </button>
+    </div>
+
+    <div class="kpi-row">
+      <div class="kpi-card">
+        <span class="kpi-icon kpi-green"><i class="bi bi-flag-fill"></i></span>
+        <div>
+          <p class="kpi-value">{{ totalChallenges }}</p>
+          <p class="kpi-label">Total Challenges</p>
+        </div>
+      </div>
+      <div class="kpi-card">
+        <span class="kpi-icon kpi-blue"><i class="bi bi-lightning-charge-fill"></i></span>
+        <div>
+          <p class="kpi-value">{{ activeChallenges }}</p>
+          <p class="kpi-label">Challenges Actifs</p>
+        </div>
+      </div>
+      <div class="kpi-card">
+        <span class="kpi-icon kpi-orange"><i class="bi bi-check2-circle"></i></span>
+        <div>
+          <p class="kpi-value">{{ completedChallenges }}</p>
+          <p class="kpi-label">Challenges Terminés</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════ FILTERS ══════════ -->
+  <div class="filter-bar">
+    <button class="filter-chip" [class.active]="activeFilter==='ALL'" (click)="filterChallenges('ALL')">Tous</button>
+    <button class="filter-chip" [class.active]="activeFilter==='PUBLIC'" (click)="filterChallenges('PUBLIC')">
+      <i class="bi bi-globe2"></i> Publics
+    </button>
+    <button class="filter-chip" [class.active]="activeFilter==='PRIVATE'" (click)="filterChallenges('PRIVATE')">
+      <i class="bi bi-lock-fill"></i> Privés
+    </button>
+  </div>
+
+  <!-- ══════════ LOADING ══════════ -->
+  <div class="loading-state" *ngIf="loading">
+    <div class="spinner-ring"></div>
+    <p>Chargement des challenges…</p>
+  </div>
+
+  <!-- ══════════ EMPTY STATE ══════════ -->
+  <div class="empty-state" *ngIf="!loading && challenges.length === 0">
+    <div class="empty-illustration">
+      <i class="bi bi-trophy"></i>
+    </div>
+    <h3>Aucun challenge pour le moment</h3>
+    <p>Inspirez vos membres en créant votre premier défi dès maintenant !</p>
+    <button class="btn-primary-cta" (click)="openModal()">
+      <i class="bi bi-plus-lg"></i> Créer mon premier challenge
+    </button>
+  </div>
+
+  <!-- ══════════ CHALLENGES GRID ══════════ -->
+  <div class="habits-grid" *ngIf="!loading && filteredChallenges.length > 0">
+    <div class="habit-card" *ngFor="let c of filteredChallenges">
+      
+      <!-- Card accent bar based on visibility -->
+      <div class="card-accent-bar" [class.bar-sport]="c.visibility === 'PUBLIC'" [class.bar-custom]="c.visibility === 'PRIVATE'"></div>
+
+      <div class="card-header-row">
+        <span class="type-badge" [class.badge-sport]="c.visibility === 'PUBLIC'" [class.badge-custom]="c.visibility === 'PRIVATE'">
+          <i class="bi" [class.bi-globe2]="c.visibility === 'PUBLIC'" [class.bi-lock-fill]="c.visibility === 'PRIVATE'"></i>
+          {{ c.visibility === 'PUBLIC' ? 'Public' : 'Privé' }}
+        </span>
+        <div class="card-header-right">
+          <span class="streak-badge" [class.status-finished]="getDaysRemaining(c.endDate) === 0">
+            {{ getDaysRemaining(c.endDate) }}j restants
+          </span>
+        </div>
+      </div>
+
+      <div class="card-body">
+        <h3 class="habit-name">{{ c.title }}</h3>
+        <p class="habit-desc">{{ c.description }}</p>
+
+        <div class="habit-meta">
+          <span class="meta-chip"><i class="bi bi-calendar3"></i> Du {{ c.startDate | date:'dd MMM' }} au {{ c.endDate | date:'dd MMM yyyy' }}</span>
+        </div>
+      </div>
+
+      <div class="card-actions">
+        <button class="action-btn btn-edit" (click)="openModal(c)" title="Modifier">
+          <i class="bi bi-pencil"></i>
+          <span>Modifier</span>
+        </button>
+        <button class="action-btn btn-del" (click)="confirmDelete(c)" title="Supprimer">
+          <i class="bi bi-trash3"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+</section>
+
+<!-- ══════════ CHALLENGE MODAL ══════════ -->
+<div class="modal-overlay" *ngIf="showModal">
+  <div class="modal-sheet">
+    <div class="modal-head">
+      <div class="modal-head-left">
+        <span class="modal-icon"><i class="bi bi-trophy"></i></span>
+        <h3>{{ isEditing ? 'Modifier Challenge' : 'Nouveau Challenge' }}</h3>
+      </div>
+      <button class="modal-close" (click)="showModal = false"><i class="bi bi-x-lg"></i></button>
+    </div>
+
+    <div class="modal-content">
+      <div class="field-group">
+        <label class="field-label">Titre du challenge <span class="req">*</span></label>
+        <input type="text" [(ngModel)]="form.title" class="field-input" placeholder="Ex: Défi 30 jours Perte de gras" />
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Description détaillée</label>
+        <textarea [(ngModel)]="form.description" class="field-input" rows="4" 
+                  placeholder="Expliquez l'objectif et les règles du challenge…"></textarea>
+      </div>
+
+      <div class="field-row-2">
+        <div class="field-group">
+          <label class="field-label">Date de début <span class="req">*</span></label>
+          <input type="date" [(ngModel)]="form.startDate" class="field-input" />
+        </div>
+        <div class="field-group">
+          <label class="field-label">Date de fin <span class="req">*</span></label>
+          <input type="date" [(ngModel)]="form.endDate" class="field-input" />
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Visibilité</label>
+        <select [(ngModel)]="form.visibility" class="field-input">
+          <option value="PUBLIC">🌍 Public (Tous les membres)</option>
+          <option value="PRIVATE">🔒 Privé (Uniquement mes groupes)</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="modal-foot">
+      <button class="btn-ghost" (click)="showModal = false">Annuler</button>
+      <button class="btn-primary" (click)="save()" [disabled]="processing">
+        <i class="bi bi-hourglass-split" *ngIf="processing"></i>
+        {{ processing ? 'Enregistrement…' : 'Enregistrer le challenge' }}
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ DELETE CONFIRM ══════════ -->
+<div class="modal-overlay" *ngIf="showDeleteConfirm">
+  <div class="modal-sheet modal-xs">
+    <div class="modal-head danger-head">
+      <div class="modal-head-left">
+        <span class="modal-icon danger-icon"><i class="bi bi-exclamation-triangle-fill"></i></span>
+        <h3>Supprimer le challenge</h3>
+      </div>
+    </div>
+    <div class="modal-content">
+      <p class="delete-confirm-text">
+        Voulez-vous vraiment supprimer <strong>"{{ challengeToDelete?.title }}"</strong> ?
+      </p>
+      <p class="delete-warn">Cette action informera les participants si le challenge est actif.</p>
+    </div>
+    <div class="modal-foot">
+      <button class="btn-ghost" (click)="showDeleteConfirm = false">Abandonner</button>
+      <button class="btn-danger" (click)="deleteChallenge()">
+        <i class="bi bi-trash3-fill"></i> Confirmer la suppression
+      </button>
+    </div>
+  </div>
+</div>
