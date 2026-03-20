@@ -1,0 +1,190 @@
+<section class="section-fade">
+  <!-- ────── GRID VIEW (Groups List) ────── -->
+  <ng-container *ngIf="!isDetailView">
+    <div class="page-title">
+      <h1>Mes Groupes Assignés</h1>
+      <p>Gérez les communautés dont vous êtes le coach référent.</p>
+    </div>
+
+    <div class="loading-state" *ngIf="loading">
+      <div class="spinner"></div>
+      <p>Chargement de vos groupes...</p>
+    </div>
+
+    <div class="empty-state" *ngIf="!loading && groups.length === 0">
+      <span class="material-icons">group_off</span>
+      <p>Aucun groupe assigné pour le moment.</p>
+    </div>
+
+    <div class="items-grid" *ngIf="!loading && groups.length > 0">
+      <div class="item-card" *ngFor="let g of groups; trackBy: trackById">
+        <div class="card-top">
+          <img [src]="'https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=500'" alt="Group Banner">
+        </div>
+        <div class="card-body">
+          <h3 class="group-name">{{ g.name }}</h3>
+          <p class="group-desc">{{ g.description }}</p>
+        </div>
+        <div class="card-foot">
+          <span class="status-badge status-success">
+            <span class="material-icons">person</span>
+            {{ g.memberIds?.length || 0 }} membres
+          </span>
+          <button class="btn-ghost" (click)="showDetails(g)">Gérer le groupe</button>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+
+  <!-- ────── DETAILS VIEW (Facebook Style) ────── -->
+  <ng-container *ngIf="isDetailView && selectedGroup">
+    <div class="fb-detail-container">
+      <!-- Group Header Coverage -->
+      <div class="fb-group-header">
+        <div class="cover-area">
+          <img [src]="'https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=1200'" alt="Group Cover"
+            class="cover-img">
+          <button class="back-circle-btn" (click)="closeDetails()" title="Retour">
+            <span class="material-icons">arrow_back</span>
+          </button>
+        </div>
+
+        <div class="header-content-wrapper">
+          <div class="group-main-meta">
+            <div class="group-avatar-wrapper">
+              <div class="group-avatar-large">
+                <span class="material-icons">groups</span>
+              </div>
+            </div>
+            <div class="group-title-info">
+              <h1>{{ selectedGroup.name }}</h1>
+              <div class="sub-meta">
+                <span class="meta-item"><span class="material-icons">public</span> Groupe Public</span>
+                <span class="meta-divider">·</span>
+                <span class="meta-item"><b>{{ selectedGroup.memberIds?.length || 0 }}</b> membres</span>
+              </div>
+            </div>
+          </div>
+          <div class="header-actions">
+            <button class="btn-fb-gray"><span class="material-icons">group_add</span> Inviter</button>
+            <button class="btn-fb-blue"><span class="material-icons">share</span> Partager</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="fb-layout-grid">
+        <!-- LEFT SIDEBAR: Members & Info -->
+        <aside class="fb-sidebar">
+          <!-- Members Card -->
+          <div class="fb-card-glass members-card">
+            <div class="card-header-fb">
+              <h3>Membres</h3>
+              <button class="text-link">Voir tout</button>
+            </div>
+            <div class="members-list-fb">
+              <div class="member-row-fb" *ngFor="let m of selectedGroup.members?.slice(0, 8); trackBy: trackById">
+                <div class="member-avatar-fb">
+                  <img *ngIf="m.avatarUrl" [src]="m.avatarUrl" [alt]="m.displayName">
+                  <span *ngIf="!m.avatarUrl" class="initials">{{ getMemberInitials(m) }}</span>
+                </div>
+                <div class="member-info-fb">
+                  <span class="member-name">{{ m.displayName }}</span>
+                  <span class="member-role" *ngIf="m.id === selectedGroup.coachId">Coach</span>
+                </div>
+              </div>
+            </div>
+            <div class="empty-notif" *ngIf="!selectedGroup.members?.length">
+              <p>Aucun membre à afficher.</p>
+            </div>
+          </div>
+        </aside>
+
+        <!-- MAIN FEED: Composer & Posts -->
+        <main class="fb-main-feed">
+          <!-- Post Composer -->
+          <div class="fb-card-glass composer-card">
+            <div class="composer-header">
+              <div class="coach-avatar-mini">
+                {{ selectedGroup.coachName?.[0] || 'C' }}
+              </div>
+              <div class="fake-input" (click)="quickPostContent = quickPostContent || ' '">
+                Quoi de neuf, {{ selectedGroup.coachName }} ?
+              </div>
+            </div>
+
+            <div class="expanded-form" *ngIf="quickPostContent !== ''">
+              <div class="divider"></div>
+              <textarea [(ngModel)]="quickPostContent" placeholder="Exprimez-vous au groupe..." rows="4"
+                [disabled]="processing">
+              </textarea>
+
+              <div class="form-group-fb">
+                <label><span class="material-icons">add_photo_alternate</span> Ajouter une image (URL)</label>
+                <input type="text" [(ngModel)]="composerImage" placeholder="https://..." [disabled]="processing">
+              </div>
+
+              <div class="form-footer-fb">
+                <button class="btn-text" (click)="resetForm()" [disabled]="processing">Annuler</button>
+                <button class="btn-fb-submit" [disabled]="processing || !quickPostContent.trim()"
+                  (click)="createQuickPost()">
+                  <span class="spinner-tiny" *ngIf="processing"></span>
+                  {{ processing ? 'Publication...' : 'Publier' }}
+                </button>
+              </div>
+            </div>
+
+            <div class="composer-footer" *ngIf="quickPostContent === ''">
+              <button class="composer-action" (click)="quickPostContent = ' '">
+                <span class="material-icons color-green">photo_library</span> Photo/vidéo
+              </button>
+              <button class="composer-action">
+                <span class="material-icons color-yellow">emoji_emotions</span> Humeur
+              </button>
+            </div>
+          </div>
+
+          <!-- Posts List -->
+          <div class="posts-feed">
+            <div class="loading-posts" *ngIf="loadingPosts">
+              <div class="spinner-small"></div>
+              <p>Chargement des publications...</p>
+            </div>
+
+            <div class="feed-empty" *ngIf="!loadingPosts && posts.length === 0">
+              <span class="material-icons">rss_feed</span>
+              <p>Aucune publication pour le moment.</p>
+            </div>
+
+            <div class="fb-post-card" *ngFor="let post of posts; trackBy: trackById">
+              <div class="post-header">
+                <div class="post-user-img">
+                  {{ post.coachName?.[0] || 'C' }}
+                </div>
+                <div class="post-user-meta">
+                  <span class="user-name">{{ post.coachName }}</span>
+                  <span class="post-date">{{ formatDate(post.createdAt) }} · <span
+                      class="material-icons">public</span></span>
+                </div>
+                <button class="btn-icon-more"><span class="material-icons">more_horiz</span></button>
+              </div>
+
+              <div class="post-content">
+                <p>{{ post.content }}</p>
+              </div>
+
+              <div class="post-media" *ngIf="post.image">
+                <img [src]="post.image" alt="Post attachment">
+              </div>
+
+              <div class="post-footer-actions">
+                <button class="feed-btn"><span class="material-icons">thumb_up_off_alt</span> J'aime</button>
+                <button class="feed-btn"><span class="material-icons">chat_bubble_outline</span> Commenter</button>
+                <button class="feed-btn"><span class="material-icons">share</span> Partager</button>
+              </div>
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+  </ng-container>
+</section>
