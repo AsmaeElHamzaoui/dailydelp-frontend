@@ -1,0 +1,471 @@
+// ============================================================
+// VARIABLES (Habit-Style Design System)
+// ============================================================
+$primary:       #324C40;
+$primary-lt:    #547D54;
+$accent:        #9EAD84;
+$accent-soft:   #e8efe0;
+$border:        #dde8d8;
+$white:         #ffffff;
+$surface:       #f9fbf7;
+$text:          #2c2c2c;
+$muted:         #7a8a7a;
+$danger:        #c0392b;
+$danger-soft:   #fff1f0;
+$radius-card:   18px;
+$radius-btn:    10px;
+$shadow-card:   0 2px 16px rgba(50,76,64,.09);
+$shadow-hover:  0 12px 36px rgba(50,76,64,.16);
+$transition:    all .22s ease;
+
+// ── Type palette (Adapted for Challenges) ──────────────────
+$types: (
+  sport:    (#e6f6ec, #1e7e46, #1e7e46), // Public
+  custom:   (#fff3e0, #e07b00, #e07b00), // Private
+);
+
+// ============================================================
+// LAYOUT
+// ============================================================
+.habit-dashboard {
+  width: 100%;
+  font-family: 'Sora', 'Outfit', system-ui, sans-serif;
+}
+
+// ============================================================
+// STATS HERO
+// ============================================================
+.stats-hero {
+  background: linear-gradient(135deg, $primary 0%, $primary-lt 100%);
+  border-radius: 24px;
+  padding: 36px 32px 28px;
+  margin-bottom: 32px;
+  color: $white;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: -60px; right: -60px;
+    width: 240px; height: 240px;
+    background: rgba(255,255,255,.05);
+    border-radius: 50%;
+  }
+}
+
+.stats-hero-inner {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  margin-bottom: 28px;
+  position: relative;
+  z-index: 1;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.greeting-title {
+  font-size: 1.9rem;
+  font-weight: 800;
+  margin: 0 0 4px;
+  line-height: 1.15;
+}
+
+.greeting-sub {
+  opacity: .7;
+  font-size: .85rem;
+  margin: 0;
+}
+
+// ── KPI row ───────────────────────────────────────────────────
+.kpi-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 14px;
+  position: relative;
+  z-index: 1;
+}
+
+.kpi-card {
+  background: rgba(255,255,255,.12);
+  border: 1px solid rgba(255,255,255,.15);
+  border-radius: 14px;
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  backdrop-filter: blur(8px);
+  transition: $transition;
+
+  &:hover { background: rgba(255,255,255,.18); }
+}
+
+.kpi-icon {
+  width: 40px; height: 40px;
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.1rem;
+  flex-shrink: 0;
+
+  &.kpi-green  { background: rgba(154,210,114,.25); color: #c1f0a0; }
+  &.kpi-blue   { background: rgba(100,180,255,.25); color: #a0d8f0; }
+  &.kpi-orange { background: rgba(255,170,80,.25);  color: #ffd9a0; }
+}
+
+.kpi-value {
+  font-size: 1.35rem;
+  font-weight: 800;
+  margin: 0;
+  line-height: 1;
+}
+
+.kpi-label {
+  font-size: .72rem;
+  opacity: .7;
+  margin: 3px 0 0;
+}
+
+// ============================================================
+// FILTER BAR
+// ============================================================
+.filter-bar {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 28px;
+}
+
+.filter-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 16px;
+  border-radius: 30px;
+  border: 1.5px solid $border;
+  background: $white;
+  color: $muted;
+  font-size: .83rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: $transition;
+
+  i { font-size: .9rem; }
+
+  &:hover {
+    border-color: $primary-lt;
+    color: $primary-lt;
+  }
+
+  &.active {
+    background: $primary;
+    border-color: $primary;
+    color: $white;
+  }
+}
+
+// ============================================================
+// LOADING / EMPTY
+// ============================================================
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 80px 0;
+  color: $muted;
+  p { margin-top: 14px; font-size: .9rem; }
+}
+
+.spinner-ring {
+  width: 44px; height: 44px;
+  border: 4px solid $accent-soft;
+  border-top-color: $primary-lt;
+  border-radius: 50%;
+  animation: spin .7s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.empty-state {
+  text-align: center;
+  padding: 80px 20px;
+  background: $white;
+  border-radius: 24px;
+  border: 1px dashed $border;
+
+  .empty-illustration {
+    width: 64px; height: 64px;
+    border-radius: 50%;
+    background: $accent-soft;
+    display: inline-flex;
+    align-items: center; justify-content: center;
+    font-size: 1.8rem;
+    color: $accent;
+    margin-bottom: 16px;
+  }
+
+  h3 { color: $text; margin-bottom: 8px; }
+  p { color: $muted; font-size: 0.9rem; margin-bottom: 20px; }
+}
+
+// ============================================================
+// GRID & CARDS
+// ============================================================
+.habits-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 20px;
+}
+
+.habit-card {
+  background: $white;
+  border: 1px solid $border;
+  border-radius: $radius-card;
+  box-shadow: $shadow-card;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transition: $transition;
+  position: relative;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: $shadow-hover;
+    border-color: $accent;
+  }
+}
+
+.card-accent-bar {
+  height: 4px;
+  width: 100%;
+  background: $muted;
+  &.bar-sport { background: #1e7e46; }
+  &.bar-custom { background: #e07b00; }
+}
+
+.card-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px 0;
+}
+
+.type-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: .72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  background: #f0f0f0;
+
+  &.badge-sport { background: #e6f6ec; color: #1e7e46; }
+  &.badge-custom { background: #fff3e0; color: #e07b00; }
+}
+
+.streak-badge {
+  background: $accent-soft;
+  color: $primary;
+  font-size: .7rem;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 20px;
+  &.status-finished { background: $danger-soft; color: $danger; }
+}
+
+.card-body {
+  padding: 12px 16px 16px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.habit-name {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: $text;
+  margin: 0;
+}
+
+.habit-desc {
+  font-size: .85rem;
+  color: $muted;
+  line-height: 1.5;
+  margin-bottom: 8px;
+}
+
+.habit-meta {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.meta-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: .75rem;
+  color: $primary-lt;
+  font-weight: 600;
+  background: $surface;
+  padding: 4px 10px;
+  border-radius: 6px;
+  border: 1px solid $border;
+}
+
+.card-actions {
+  display: flex;
+  gap: 8px;
+  padding: 12px 16px;
+  border-top: 1px solid $border;
+  background: #fafafa;
+}
+
+.action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border-radius: $radius-btn;
+  border: none;
+  cursor: pointer;
+  font-size: .8rem;
+  font-weight: 700;
+  transition: $transition;
+}
+
+.btn-edit {
+  flex: 1;
+  background: $primary;
+  color: $white;
+  &:hover { background: $primary-lt; }
+}
+
+.btn-del {
+  background: $danger-soft;
+  color: $danger;
+  &:hover { background: $danger; color: $white; }
+}
+
+// ============================================================
+// MODALS (Habit-Style)
+// ============================================================
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(16, 11, 0, .45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  backdrop-filter: blur(4px);
+  animation: fade-in .2s ease;
+}
+
+@keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+
+.modal-sheet {
+  background: $white;
+  border-radius: 24px;
+  width: 90%;
+  max-width: 520px;
+  box-shadow: 0 20px 60px rgba(0,0,0,.2);
+  animation: slide-up .3s cubic-bezier(0.16, 1, 0.3, 1);
+  overflow: hidden;
+
+  &.modal-xs { max-width: 400px; }
+}
+
+@keyframes slide-up { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+.modal-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px;
+  border-bottom: 2px solid $surface;
+  &.danger-head { background: $danger-soft; }
+}
+
+.modal-head-left { display: flex; align-items: center; gap: 14px; }
+
+.modal-icon {
+  width: 42px; height: 42px;
+  border-radius: 12px;
+  background: $accent-soft;
+  color: $primary;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.2rem;
+  &.danger-icon { background: $danger-soft; color: $danger; }
+}
+
+.modal-close {
+  background: $surface;
+  border: none;
+  color: $muted;
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: $transition;
+  &:hover { background: $border; color: $text; }
+}
+
+.modal-content {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.modal-foot {
+  padding: 16px 24px 24px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+// ── Form fields ───────────────────────────────────────────────
+.field-group { display: flex; flex-direction: column; gap: 6px; }
+.field-label { font-size: 0.82rem; font-weight: 700; color: $primary; .req { color: $danger; } }
+.field-input {
+  width: 100%; padding: 10px 14px;
+  border: 1.5px solid $border; border-radius: 12px;
+  font-size: 0.9rem; color: $text; outline: none; transition: $transition;
+  &:focus { border-color: $primary; box-shadow: 0 0 0 3px rgba(84,125,84, 0.1); }
+}
+.field-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+.btn-primary-cta {
+  background: $white; color: $primary; border: none; border-radius: 12px;
+  padding: 12px 24px; font-weight: 800; cursor: pointer; transition: $transition;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  &:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,0.15); }
+}
+
+.btn-primary {
+  background: $primary; color: $white; border: none; border-radius: 12px;
+  padding: 12px 24px; font-weight: 700; cursor: pointer; transition: $transition;
+  &:hover { background: $primary-lt; }
+  &:disabled { opacity: 0.6; cursor: not-allowed; }
+}
+
+.btn-ghost {
+  background: transparent; border: 1.5px solid $border; color: $muted;
+  border-radius: 12px; padding: 12px 24px; font-weight: 700; cursor: pointer;
+  &:hover { border-color: $primary; color: $primary; }
+}
+
+.btn-danger {
+  background: $danger; color: $white; border: none; border-radius: 12px;
+  padding: 12px 24px; font-weight: 700; cursor: pointer;
+  &:hover { background: darken($danger, 5%); }
+}
+
+// ── Shared globals ───────────────────────────────────────────
+.section-fade { animation: fadeIn .4s ease-out; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
