@@ -14,16 +14,21 @@ export interface ProfileUpdateRequest {
 @Injectable({ providedIn: 'root' })
 export class UserService {
 
-  private api = `${environment.apiUrl}/api/profile`;
+  private api = `${environment.apiUrl}/api/membres`;
 
   constructor(private http: HttpClient) {}
 
-  /** GET /api/user/profile */
+  /** GET /api/membres (My Profile) */
   getMyProfile(): Observable<User> {
     return this.http.get<User>(this.api);
   }
 
-  /** PUT /api/user/profile */
+  /** GET /api/membres/users (All Users) */
+  getUsers(): Observable<User[]> {
+    return this.http.get<User[]>(`${this.api}/users`);
+  }
+
+  /** PUT /api/membres */
   updateProfile(request: ProfileUpdateRequest): Observable<User> {
     return this.http.put<User>(this.api, request);
   }

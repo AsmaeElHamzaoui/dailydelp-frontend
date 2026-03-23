@@ -3,6 +3,7 @@ import { UserDashboardComponent } from './components/user-dashboard/user-dashboa
 import { ProfileComponent } from './components/profile/profile.component';
 import { GroupComponent } from './components/group/group.component';
 import { MesInscriptionsComponent } from './components/mesInscriptions/mes-inscriptions.component';
+import { MesGroupesComponent } from './components/mesGroupes/mes-groupes.component';
 
 export const userRoutes: Routes = [
   {
@@ -20,5 +21,9 @@ export const userRoutes: Routes = [
   {
     path: 'mes-inscriptions',
     component: MesInscriptionsComponent
+  },
+  {
+    path: 'mes-groupes/:id',
+    component: MesGroupesComponent
   }
 ];

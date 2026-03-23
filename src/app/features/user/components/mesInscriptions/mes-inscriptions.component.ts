@@ -4,11 +4,13 @@ import { RouterModule } from '@angular/router';
 import { InscriptionService } from '../../../admin/services/inscription.service';
 import { UserService } from '../../services/user.service';
 import { InscriptionResponse } from '../../../admin/models/inscription.model';
+import { HeaderComponent } from '../../../../shared/components/header';
+import { FooterComponent } from '../../../../shared/components/footer';
 
 @Component({
   selector: 'app-mes-inscriptions',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, HeaderComponent, FooterComponent],
   templateUrl: './mes-inscriptions.component.html',
   styleUrls: ['./mes-inscriptions.component.scss']
 })
@@ -29,7 +31,7 @@ export class MesInscriptionsComponent implements OnInit {
   constructor(
     private inscriptionService: InscriptionService,
     private userService: UserService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.loadData();
@@ -78,10 +80,10 @@ export class MesInscriptionsComponent implements OnInit {
 
   getStatusConfig(status: string): { icon: string; label: string; cls: string } {
     switch (status) {
-      case 'PENDING':  return { icon: 'bi-hourglass-split', label: 'En attente', cls: 'pending' };
-      case 'ACCEPTEE': return { icon: 'bi-check-circle-fill', label: 'Acceptée',  cls: 'accepted' };
-      case 'REFUSEE':  return { icon: 'bi-x-circle-fill',     label: 'Refusée',   cls: 'refused' };
-      default:         return { icon: 'bi-question-circle',   label: status,     cls: 'default' };
+      case 'PENDING': return { icon: 'bi-hourglass-split', label: 'En attente', cls: 'pending' };
+      case 'ACCEPTEE': return { icon: 'bi-check-circle-fill', label: 'Acceptée', cls: 'accepted' };
+      case 'REFUSEE': return { icon: 'bi-x-circle-fill', label: 'Refusée', cls: 'refused' };
+      default: return { icon: 'bi-question-circle', label: status, cls: 'default' };
     }
   }
 }

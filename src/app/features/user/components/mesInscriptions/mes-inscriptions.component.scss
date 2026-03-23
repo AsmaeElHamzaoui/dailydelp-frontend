@@ -1,29 +1,29 @@
 // ============================================================
 // VARIABLES
 // ============================================================
-$primary:       #324C40;
-$primary-lt:    #547D54;
-$accent:        #9EAD84;
-$accent-soft:   #e8efe0;
-$border:        #dde8d8;
-$white:         #ffffff;
-$surface:       #f9fbf7;
-$text:          #2c2c2c;
-$muted:         #7a8a7a;
-$danger:        #c0392b;
-$danger-soft:   #fff1f0;
-$radius:        18px;
-$radius-btn:    10px;
-$shadow-card:   0 2px 16px rgba(50,76,64,.09);
-$shadow-hover:  0 12px 36px rgba(50,76,64,.16);
-$transition:    all .22s ease;
+$primary: #324C40;
+$primary-lt: #547D54;
+$accent: #9EAD84;
+$accent-soft: #e8efe0;
+$border: #dde8d8;
+$white: #ffffff;
+$surface: #f9fbf7;
+$text: #2c2c2c;
+$muted: #7a8a7a;
+$danger: #c0392b;
+$danger-soft: #fff1f0;
+$radius: 18px;
+$radius-btn: 10px;
+$shadow-card: 0 2px 16px rgba(50, 76, 64, .09);
+$shadow-hover: 0 12px 36px rgba(50, 76, 64, .16);
+$transition: all .22s ease;
 
 // ── Status palette ─────────────────────────────────────────────
 $status-map: (
-  pending:  (#fff8e1, #f57f17),
+  pending: (#fff8e1, #f57f17),
   accepted: (#e6f6ec, #1e7e46),
-  refused:  (#fde8e8, #c0392b),
-  default:  (#f5f5f5, #7a8a7a),
+  refused: (#fde8e8, #c0392b),
+  default: (#f5f5f5, #7a8a7a),
 );
 
 // ============================================================
@@ -52,18 +52,22 @@ $status-map: (
   &::before {
     content: '';
     position: absolute;
-    top: -60px; right: -60px;
-    width: 240px; height: 240px;
-    background: rgba(255,255,255,.05);
+    top: -60px;
+    right: -60px;
+    width: 240px;
+    height: 240px;
+    background: rgba(255, 255, 255, .05);
     border-radius: 50%;
   }
 
   &::after {
     content: '';
     position: absolute;
-    bottom: -80px; left: -40px;
-    width: 280px; height: 280px;
-    background: rgba(255,255,255,.04);
+    bottom: -80px;
+    left: -40px;
+    width: 280px;
+    height: 280px;
+    background: rgba(255, 255, 255, .04);
     border-radius: 50%;
   }
 }
@@ -102,8 +106,8 @@ $status-map: (
 }
 
 .kpi-card {
-  background: rgba(255,255,255,.12);
-  border: 1px solid rgba(255,255,255,.15);
+  background: rgba(255, 255, 255, .12);
+  border: 1px solid rgba(255, 255, 255, .15);
   border-radius: 14px;
   padding: 14px 16px;
   display: flex;
@@ -112,20 +116,40 @@ $status-map: (
   backdrop-filter: blur(8px);
   transition: $transition;
 
-  &:hover { background: rgba(255,255,255,.18); }
+  &:hover {
+    background: rgba(255, 255, 255, .18);
+  }
 }
 
 .kpi-icon {
-  width: 40px; height: 40px;
+  width: 40px;
+  height: 40px;
   border-radius: 10px;
-  display: flex; align-items: center; justify-content: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   font-size: 1.1rem;
   flex-shrink: 0;
 
-  &.kpi-green  { background: rgba(154,210,114,.25); color: #c1f0a0; }
-  &.kpi-blue   { background: rgba(100,180,255,.25); color: #a0d8f0; }
-  &.kpi-orange { background: rgba(255,170,80,.25);  color: #ffd9a0; }
-  &.kpi-purple { background: rgba(190,140,255,.25); color: #d8bcff; }
+  &.kpi-green {
+    background: rgba(154, 210, 114, .25);
+    color: #c1f0a0;
+  }
+
+  &.kpi-blue {
+    background: rgba(100, 180, 255, .25);
+    color: #a0d8f0;
+  }
+
+  &.kpi-orange {
+    background: rgba(255, 170, 80, .25);
+    color: #ffd9a0;
+  }
+
+  &.kpi-purple {
+    background: rgba(190, 140, 255, .25);
+    color: #d8bcff;
+  }
 }
 
 .kpi-value {
@@ -165,7 +189,9 @@ $status-map: (
   cursor: pointer;
   transition: $transition;
 
-  i { font-size: .9rem; }
+  i {
+    font-size: .9rem;
+  }
 
   &:hover {
     border-color: $primary-lt;
@@ -189,25 +215,34 @@ $status-map: (
   padding: 80px 0;
   color: $muted;
 
-  p { margin-top: 14px; font-size: .9rem; }
+  p {
+    margin-top: 14px;
+    font-size: .9rem;
+  }
 }
 
 .spinner-ring {
-  width: 44px; height: 44px;
+  width: 44px;
+  height: 44px;
   border: 4px solid $accent-soft;
   border-top-color: $primary-lt;
   border-radius: 50%;
   animation: spin .7s linear infinite;
 }
 
-@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
 
 .empty-state {
   text-align: center;
   padding: 80px 20px;
 
   .empty-illustration {
-    width: 88px; height: 88px;
+    width: 88px;
+    height: 88px;
     border-radius: 50%;
     background: $accent-soft;
     display: inline-flex;
@@ -218,8 +253,18 @@ $status-map: (
     margin-bottom: 20px;
   }
 
-  h3 { font-size: 1.2rem; font-weight: 700; color: $text; margin: 0 0 8px; }
-  p { color: $muted; font-size: .9rem; margin: 0 0 24px; }
+  h3 {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: $text;
+    margin: 0 0 8px;
+  }
+
+  p {
+    color: $muted;
+    font-size: .9rem;
+    margin: 0 0 24px;
+  }
 }
 
 // ============================================================
@@ -260,7 +305,10 @@ $status-map: (
   @each $status, $colors in $status-map {
     $bg: nth($colors, 1);
     $col: nth($colors, 2);
-    &.bar-#{$status} { background: $col; }
+
+    &.bar-#{$status} {
+      background: $col;
+    }
   }
 }
 
@@ -297,9 +345,13 @@ $status-map: (
   letter-spacing: .04em;
 
   @each $status, $colors in $status-map {
-    $bg:  nth($colors, 1);
+    $bg: nth($colors, 1);
     $col: nth($colors, 2);
-    &.badge-#{$status} { background: $bg; color: $col; }
+
+    &.badge-#{$status} {
+      background: $bg;
+      color: $col;
+    }
   }
 }
 
@@ -344,7 +396,10 @@ $status-map: (
   padding: 3px 8px;
   border-radius: 6px;
 
-  i { font-size: .8rem; color: $accent; }
+  i {
+    font-size: .8rem;
+    color: $accent;
+  }
 }
 
 // ── Actions ───────────────────────────────────────────────────
@@ -375,9 +430,14 @@ $status-map: (
   color: $white;
   gap: 8px;
 
-  i { font-size: 1rem; }
+  i {
+    font-size: 1rem;
+  }
 
-  &:hover { background: $primary-lt; transform: translateY(-1px); }
+  &:hover {
+    background: $primary-lt;
+    transform: translateY(-1px);
+  }
 }
 
 .btn-primary-cta {
@@ -393,7 +453,7 @@ $status-map: (
   font-weight: 700;
   cursor: pointer;
   transition: $transition;
-  box-shadow: 0 4px 10px rgba(0,0,0,.15);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, .15);
   text-decoration: none;
 
   &:hover {
@@ -417,5 +477,7 @@ $status-map: (
   transition: $transition;
   text-decoration: none;
 
-  &:hover { background: $primary-lt; }
+  &:hover {
+    background: $primary-lt;
+  }
 }
