@@ -1,0 +1,176 @@
+<app-header></app-header>
+<div class="fb-container">
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-overlay">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Chargement...</span>
+    </div>
+  </div>
+
+  <div *ngIf="!loading && group" class="group-layout">
+
+    <!-- Group Header Section -->
+    <header class="group-header">
+      <div class="header-cover">
+      </div>
+      <div class="header-content">
+        <div class="group-info">
+          <h1>{{ group.name }}</h1>
+          <p class="text-muted"><i class="bi bi-people-fill"></i> {{ group.memberIds.length }} membres · Groupe privé
+          </p>
+        </div>
+      </div>
+      <nav class="header-nav">
+        <a href="javascript:void(0)" class="active">À propos</a>
+      </nav>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="feed-container">
+
+      <!-- Create Post (Placeholder) -->
+      <div class="create-post-card card mb-3">
+        <div class="card-body">
+          <div class="d-flex align-items-center mb-3">
+            <div class="avatar-sm me-2">
+              <span class="avatar-initials">{{ currentUser?.displayName?.charAt(0) || 'U' }}</span>
+            </div>
+            <button class="btn btn-gray-faint flex-grow-1 text-start rounded-pill px-3 py-2">
+              Quoi de neuf, {{ currentUser?.displayName }} ?
+            </button>
+          </div>
+          <hr>
+          <div class="d-flex justify-content-around">
+            <button class="btn btn-ghost"><i class="bi bi-camera-video-fill text-danger"></i> Vidéo en direct</button>
+            <button class="btn btn-ghost"><i class="bi bi-images text-success"></i> Photo/vidéo</button>
+            <button class="btn btn-ghost"><i class="bi bi-emoji-smile-fill text-warning"></i> Humeur/activité</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Posts List -->
+      <div *ngFor="let post of posts" class="post-card card mb-3">
+        <div class="card-body">
+          <!-- Post Header -->
+          <div class="d-flex justify-content-between align-items-start mb-3">
+            <div class="d-flex align-items-center">
+              <div class="avatar me-2">
+                <span class="avatar-initials bg-info text-white">{{ post.coachName.charAt(0) }}</span>
+              </div>
+              <div>
+                <h6 class="mb-0 fw-bold">{{ post.coachName }} <span
+                    class="badge bg-light text-dark fw-normal ms-1">Coach</span></h6>
+                <small class="text-muted">{{ post.createdAt | date:'d MMMM, HH:mm' }} · <i
+                    class="bi bi-globe"></i></small>
+              </div>
+            </div>
+            <button class="btn btn-ghost-sm"><i class="bi bi-three-dots"></i></button>
+          </div>
+
+          <!-- Post Content -->
+          <p class="post-text">{{ post.content }}</p>
+          <div *ngIf="post.image" class="post-image-container mb-3">
+            <img [src]="post.image" alt="Post content" class="img-fluid rounded">
+          </div>
+
+          <!-- Post Interactions Count -->
+          <div class="d-flex justify-content-between text-muted small py-2">
+            <div>
+              <span class="reaction-icons"><i class="bi bi-hand-thumbs-up-fill text-primary"></i> <i
+                  class="bi bi-heart-fill text-danger"></i></span>
+              <span>12</span>
+            </div>
+            <div>
+              <span>{{ commentsByPost[post.id]?.length || 0 }} commentaires</span> · <span>3 partages</span>
+            </div>
+          </div>
+          <hr class="my-1">
+
+          <!-- Interaction Buttons -->
+          <div class="d-flex justify-content-around post-actions mb-2">
+            <button class="btn btn-ghost flex-grow-1"><i class="bi bi-hand-thumbs-up"></i> J'aime</button>
+            <button class="btn btn-ghost flex-grow-1"><i class="bi bi-chat-square"></i> Commenter</button>
+            <button class="btn btn-ghost flex-grow-1"><i class="bi bi-share"></i> Partager</button>
+          </div>
+          <hr class="my-1">
+
+          <!-- Comments Section -->
+          <div class="comments-section mt-3">
+            <!-- Existing Comments -->
+            <div *ngFor="let comment of commentsByPost[post.id]" class="d-flex mb-2">
+              <div class="avatar-xs me-2 mt-1">
+                <span class="avatar-initials bg-secondary text-white">{{ comment.userName.charAt(0) }}</span>
+              </div>
+              <div class="comment-bubble">
+                <h6 class="mb-0 small fw-bold">{{ comment.userName }}</h6>
+                <p class="mb-0 small">{{ comment.content }}</p>
+                <div class="comment-meta mt-1">
+                  <span class="small text-muted me-2">J'aime</span>
+                  <span class="small text-muted me-2">Répondre</span>
+                  <span class="small text-muted">{{ comment.createdAt | date:'short' }}</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Add Comment Input -->
+            <div class="d-flex mt-3">
+              <div class="avatar-xs me-2">
+                <span class="avatar-initials">{{ currentUser?.displayName?.charAt(0) || 'U' }}</span>
+              </div>
+              <div class="flex-grow-1 position-relative">
+                <input type="text" class="form-control rounded-pill bg-light border-0 px-3 py-2"
+                  placeholder="Écrivez un commentaire..." [(ngModel)]="newComments[post.id]"
+                  (keyup.enter)="addComment(post.id)">
+                <div class="input-icons text-muted">
+                  <i class="bi bi-emoji-smile me-2"></i>
+                  <i class="bi bi-camera me-2"></i>
+                  <i class="bi bi-sticky me-2"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </main>
+
+    <!-- Sidebar (Right Side) -->
+    <aside class="group-sidebar d-none d-lg-block">
+      <!-- About Card -->
+      <div class="card mb-3 side-card shadow-sm">
+        <div class="card-body">
+          <h6 class="fw-bold mb-3">À propos</h6>
+          <p class="small text-dark-gray">{{ group.description || 'Bienvenue dans notre groupe !' }}</p>
+          <hr class="my-3 op-1">
+          <div class="small mb-3"><i class="bi bi-lock-fill me-2"></i> <strong>Privé</strong> · Seuls les membres
+            peuvent voir qui fait partie du groupe et ce qu'ils publient.</div>
+          <div class="small mb-3"><i class="bi bi-eye-fill me-2"></i> <strong>Visible</strong> · Tout le monde peut
+            trouver ce groupe.</div>
+        </div>
+      </div>
+
+      <!-- Members Card -->
+      <div class="card side-card shadow-sm">
+        <div class="card-body p-0">
+          <div class="d-flex justify-content-between align-items-center px-3 pt-3 mb-2">
+            <h6 class="fw-bold m-0">Membres <span class="text-muted fw-normal small">· {{ members.length }}</span></h6>
+            <a href="javascript:void(0)" class="text-primary small text-decoration-none">Tout voir</a>
+          </div>
+          <div class="members-grid px-3 pb-3">
+            <div *ngFor="let member of members.slice(0, 9)" class="member-item">
+              <div class="member-avatar">
+                <img *ngIf="member.avatarUrl" [src]="member.avatarUrl" [alt]="member.displayName || 'Membre'"
+                  class="w-100 h-100 object-fit-cover">
+                <span *ngIf="!member.avatarUrl"
+                  class="avatar-initials bg-light-blue">{{ (member.displayName || 'M').charAt(0) }}</span>
+              </div>
+              <span class="member-name">{{ member.displayName || 'Utilisateur' }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+  </div>
+</div>
+<app-footer></app-footer>
