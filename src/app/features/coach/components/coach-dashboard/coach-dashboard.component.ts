@@ -40,8 +40,8 @@ export class CoachDashboardComponent implements OnInit {
   myPosts: PostResponse[] = [];
 
   navItems = [
-    { label: 'Dashboard', icon: 'grid_view' },
-    { label: 'Groupes', icon: 'groups' },
+    { label: 'Dashboard', icon: 'dashboard' },
+    { label: 'Groupes', icon: 'menu_book' },
     { label: 'Challenges', icon: 'emoji_events' },
     { label: 'Publications', icon: 'forum' }
   ];
