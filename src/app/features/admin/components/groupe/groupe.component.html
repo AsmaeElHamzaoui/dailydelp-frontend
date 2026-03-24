@@ -47,47 +47,6 @@
     </div>
   </div>
 
-  <!-- ══════════ PENDING REQUESTS SECTION ══════════ -->
-  <div class="pending-requests-section" *ngIf="pendingInscriptions.length > 0">
-    <div class="section-header">
-      <div class="header-content">
-        <i class="bi bi-person-plus-fill section-icon"></i>
-        <div>
-          <h2 class="section-title">Demandes d'inscription en attente</h2>
-          <p class="section-subtitle">Vous avez {{ pendingInscriptions.length }} demande{{ pendingInscriptions.length >
-            1 ? 's' : '' }} à traiter</p>
-        </div>
-      </div>
-    </div>
-
-    <div class="requests-grid">
-      <div class="request-card" *ngFor="let ins of pendingInscriptions">
-        <div class="request-user">
-          <div class="user-avatar">{{ getInitialsFromName(ins.userName) }}</div>
-          <div class="user-info">
-            <span class="user-name">{{ ins.userName }}</span>
-            <span class="request-date">le {{ ins.createdAt | date:'dd/MM/yyyy' }}</span>
-          </div>
-        </div>
-        <div class="request-group">
-          <i class="bi bi-arrow-right"></i>
-          <span class="group-target">{{ ins.groupName }}</span>
-        </div>
-        <div class="request-actions">
-          <button class="btn-action btn-accept" (click)="acceptInscription(ins)" [disabled]="processingId === ins.id">
-            <i class="bi bi-check-lg" *ngIf="processingId !== ins.id"></i>
-            <i class="bi bi-hourglass-split spin-icon" *ngIf="processingId === ins.id"></i>
-            Accepter
-          </button>
-          <button class="btn-action btn-refuse" (click)="refuseInscription(ins)" [disabled]="processingId === ins.id">
-            <i class="bi bi-x-lg"></i>
-            Refuser
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
-
   <!-- ══════════ FILTERS ══════════ -->
   <div class="filter-bar">
     <button class="filter-chip" [class.active]="activeFilter==='ALL'" (click)="filterGroups('ALL')">
