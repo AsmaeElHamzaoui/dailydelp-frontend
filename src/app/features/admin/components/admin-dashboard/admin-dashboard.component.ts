@@ -11,6 +11,7 @@ import { PostComponent } from '../post/post.component';
 import { UsersComponent } from '../users/users.component';
 import { AnalyticsComponent } from '../analytics/analytics.component';
 import { InscriptionComponent } from '../inscription/inscription.component';
+import { AuthService } from '../../../../core/services/auth.service';
 
 import { UserService as ProfileService } from '../../../user/services/user.service';
 import { UserService } from '../../services/user.service';
@@ -76,7 +77,7 @@ export class AdminDashboardComponent implements OnInit, AfterViewInit, OnDestroy
     private groupService: GroupService,
     private postService: PostService,
     private inscriptionService: InscriptionService,
-
+    private authService: AuthService
   ) { }
 
   ngOnInit(): void {
@@ -367,5 +368,9 @@ export class AdminDashboardComponent implements OnInit, AfterViewInit, OnDestroy
     if (item.label === 'Dashboard') {
       setTimeout(() => this.initCharts(), 80);
     }
+  }
+
+  logout(): void {
+    this.authService.logout();
   }
 }
