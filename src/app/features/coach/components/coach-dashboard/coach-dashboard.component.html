@@ -6,28 +6,35 @@
         <span class="material-icons logo-icon">eco</span>
         <span class="logo-text">Hab<span>it</span></span>
       </div>
+      <button class="collapse-btn" (click)="toggleSidebar()" title="Toggle sidebar">
+        <svg *ngIf="isSidebarCollapsed" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+          fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="5" y1="12" x2="19" y2="12" />
+          <polyline points="12 5 19 12 12 19" />
+        </svg>
+        <svg *ngIf="!isSidebarCollapsed" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+          fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="3" y1="6" x2="21" y2="6" />
+          <line x1="3" y1="12" x2="21" y2="12" />
+          <line x1="3" y1="18" x2="21" y2="18" />
+        </svg>
+      </button>
     </div>
 
     <nav class="sidebar-nav">
-      <button *ngFor="let item of navItems" class="nav-item" [class.active]="activeSection === item.label"
-        (click)="setSection(item.label)">
+      <a *ngFor="let item of navItems" class="nav-item" [class.active]="activeSection === item.label"
+        (click)="setSection(item.label)" [title]="item.label">
         <span class="material-icons">{{ item.icon }}</span>
         <span class="nav-label">{{ item.label }}</span>
-      </button>
-
-      <button class="nav-item logout-btn" (click)="logout()">
-        <span class="material-icons">logout</span>
-        <span class="nav-label">Déconnexion</span>
-      </button>
+      </a>
     </nav>
   </aside>
 
   <!-- ══════════ MAIN WRAPPER ══════════ -->
   <div class="main-wrapper">
     <header class="top-header">
-      <button class="menu-toggle" (click)="toggleSidebar()">
-        <span class="material-icons">{{ isSidebarCollapsed ? 'menu_open' : 'menu' }}</span>
-      </button>
+      <!-- Empty space for layout balance -->
+      <div class="header-left"></div>
 
       <div class="bar-right">
         <div class="coach-profile-mini">
@@ -39,6 +46,10 @@
             <span class="p-role">Coach Certifié</span>
           </div>
         </div>
+
+        <button class="logout-pill" (click)="logout()" title="Déconnexion">
+          <span class="material-icons">logout</span>
+        </button>
       </div>
     </header>
 

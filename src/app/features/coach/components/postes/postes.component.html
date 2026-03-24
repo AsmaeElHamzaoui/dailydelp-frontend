@@ -43,34 +43,60 @@
   </div>
 </section>
 
-<!-- MODAL -->
-<div class="modal-overlay" *ngIf="showModal">
-  <div class="modal-sheet">
+<!-- MODAL UI UNIFIED -->
+<div class="modal-overlay" *ngIf="showModal" (click)="showModal = false">
+  <div class="modal-sheet" (click)="$event.stopPropagation()">
+    
     <div class="modal-head">
-      <h3>{{ isEditing ? 'Modifier Publication' : 'Nouveau Post' }}</h3>
-      <button class="btn-ghost" style="padding: 4px; border: none;" (click)="showModal = false">
+      <div class="modal-head-left">
+        <span class="modal-icon">
+          <span class="material-icons">{{ isEditing ? 'edit_note' : 'add_circle' }}</span>
+        </span>
+        <div>
+          <h3>{{ isEditing ? 'Modifier Publication' : 'Nouveau Post' }}</h3>
+          <p class="modal-subtitle">
+            {{ isEditing ? 'Mettez à jour le contenu de votre post' : 'Partagez une nouvelle mise à jour avec vos groupes' }}
+          </p>
+        </div>
+      </div>
+      <button class="modal-close" (click)="showModal = false">
         <span class="material-icons">close</span>
       </button>
     </div>
-    <div class="modal-body">
-      <div class="form-group">
-        <label>Groupe Cible</label>
-        <select [(ngModel)]="form.groupId">
+
+    <div class="modal-content">
+      <div class="field-group">
+        <label class="field-label">Groupe Cible <span class="req">*</span></label>
+        <select [(ngModel)]="form.groupId" class="field-input">
+          <option [ngValue]="undefined" disabled>— Sélectionner un groupe —</option>
           <option *ngFor="let g of groups" [value]="g.id">{{ g.name }}</option>
         </select>
       </div>
-      <div class="form-group">
-        <label>Contenu</label>
-        <textarea [(ngModel)]="form.content" rows="6"></textarea>
+
+      <div class="field-group">
+        <label class="field-label">Contenu <span class="req">*</span></label>
+        <textarea [(ngModel)]="form.content" rows="5" class="field-input" 
+          placeholder="Quoi de neuf ? Partagez vos pensées..."></textarea>
       </div>
-      <div class="form-group">
-        <label>Image URL</label>
-        <input type="text" [(ngModel)]="form.image">
+
+      <div class="field-group">
+        <label class="field-label">Image URL <span class="optional">(optionnel)</span></label>
+        <div class="input-with-icon">
+          <span class="material-icons icon-inside">image</span>
+          <input type="text" [(ngModel)]="form.image" class="field-input" 
+            placeholder="https://exemple.com/image.jpg">
+        </div>
       </div>
     </div>
+
     <div class="modal-foot">
       <button class="btn-ghost" (click)="showModal = false">Annuler</button>
-      <button class="btn-primary" (click)="save()" [disabled]="processing">Publier</button>
+      <button class="btn-primary" (click)="save()" [disabled]="processing">
+        <span class="material-icons" *ngIf="!processing">send</span>
+        <div class="spinner-xs" *ngIf="processing"></div>
+        <span>{{ processing ? 'En cours...' : (isEditing ? 'Mettre à jour' : 'Publier') }}</span>
+      </button>
     </div>
+
   </div>
 </div>

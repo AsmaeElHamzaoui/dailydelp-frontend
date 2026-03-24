@@ -183,7 +183,7 @@ $ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
   }
 }
 
-// MODAL STYLES
+// MODAL STYLES UNIFIED
 .modal-overlay {
   position: fixed;
   inset: 0;
@@ -193,71 +193,162 @@ $ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
   align-items: center;
   justify-content: center;
   z-index: 1000;
+  animation: fadeIn 0.3s ease-out;
 }
 
 .modal-sheet {
   background: white;
-  width: 100%;
-  max-width: 500px;
+  width: 92%;
+  max-width: 520px;
   border-radius: 24px;
   box-shadow: 0 30px 60px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: modalSlideUp 0.4s $ease-spring;
 
   .modal-head {
-    padding: 24px;
+    padding: 24px 28px;
     border-bottom: 1px solid $border;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    background: #FAFCF8;
 
-    h3 {
-      font-family: 'Sora';
-      font-weight: 800;
-      color: $primary;
-      margin: 0;
+    .modal-head-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+
+      .modal-icon {
+        width: 44px;
+        height: 44px;
+        background: $accent-soft;
+        color: $accent;
+        border-radius: 12px;
+        display: grid;
+        place-items: center;
+        .material-icons { font-size: 24px; }
+      }
+
+      h3 {
+        font-family: 'Sora', sans-serif;
+        font-weight: 800;
+        font-size: 1.15rem;
+        color: $primary;
+        margin: 0;
+      }
+
+      .modal-subtitle {
+        font-size: 0.82rem;
+        color: $text-muted;
+        margin: 2px 0 0;
+      }
+    }
+
+    .modal-close {
+      background: transparent;
+      border: none;
+      color: $text-muted;
+      cursor: pointer;
+      padding: 6px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      transition: all 0.2s;
+
+      &:hover {
+        background: rgba(224, 82, 82, 0.1);
+        color: $danger;
+        transform: rotate(90deg);
+      }
     }
   }
 
-  .modal-body {
-    padding: 24px;
+  .modal-content {
+    padding: 28px;
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 20px;
+    max-height: 70vh;
+    overflow-y: auto;
   }
 
   .modal-foot {
-    padding: 20px 24px;
-    background: $accent-soft;
+    padding: 20px 28px;
+    background: #FAFCF8;
+    border-top: 1px solid $border;
     display: flex;
     justify-content: flex-end;
     gap: 12px;
   }
 }
 
-.form-group {
+.field-group {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
 
-  label {
-    font-size: 0.8rem;
+  .field-label {
+    font-size: 0.78rem;
     font-weight: 700;
     color: $primary;
     text-transform: uppercase;
+    letter-spacing: 0.4px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+
+    .req { color: $danger; }
+    .optional { color: $text-muted; text-transform: none; font-weight: 500; }
   }
 
-  input,
-  textarea,
-  select {
-    padding: 12px 14px;
+  .field-input {
+    width: 100%;
+    padding: 14px 16px;
+    background: #F9FBF8;
     border: 1px solid $border;
-    border-radius: 12px;
-    font-family: 'DM Sans';
+    border-radius: 14px;
+    font-family: 'DM Sans', sans-serif;
     font-size: 0.95rem;
+    color: $primary;
+    transition: all 0.25s;
+
+    &::placeholder { color: #A0B0A8; }
 
     &:focus {
+      background: white;
       border-color: $accent;
       outline: none;
-      box-shadow: 0 0 0 3px rgba(127, 176, 105, 0.12);
+      box-shadow: 0 0 0 4px rgba(127, 176, 105, 0.12);
     }
   }
+
+  .input-with-icon {
+    position: relative;
+    .icon-inside {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #A0B0A8;
+      font-size: 1.2rem;
+      pointer-events: none;
+    }
+    .field-input { padding-left: 44px; }
+  }
+}
+
+.spinner-xs {
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes modalSlideUp {
+  from { opacity: 0; transform: translateY(30px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
 }

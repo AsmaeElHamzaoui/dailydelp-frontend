@@ -8,27 +8,27 @@
         <p class="greeting-sub">{{ totalChallenges }} challenge{{ totalChallenges !== 1 ? 's' : '' }} au total</p>
       </div>
       <button class="btn-primary-cta" (click)="openModal()">
-        <i class="bi bi-plus-lg"></i> Nouveau Challenge
+        <span class="material-icons">add</span> Nouveau Challenge
       </button>
     </div>
 
     <div class="kpi-row">
       <div class="kpi-card">
-        <span class="kpi-icon kpi-green"><i class="bi bi-flag-fill"></i></span>
+        <span class="kpi-icon kpi-green"><span class="material-icons">flag</span></span>
         <div>
           <p class="kpi-value">{{ totalChallenges }}</p>
           <p class="kpi-label">Total Challenges</p>
         </div>
       </div>
       <div class="kpi-card">
-        <span class="kpi-icon kpi-blue"><i class="bi bi-lightning-charge-fill"></i></span>
+        <span class="kpi-icon kpi-blue"><span class="material-icons">bolt</span></span>
         <div>
           <p class="kpi-value">{{ activeChallenges }}</p>
           <p class="kpi-label">Challenges Actifs</p>
         </div>
       </div>
       <div class="kpi-card">
-        <span class="kpi-icon kpi-orange"><i class="bi bi-check2-circle"></i></span>
+        <span class="kpi-icon kpi-orange"><span class="material-icons">check_circle</span></span>
         <div>
           <p class="kpi-value">{{ completedChallenges }}</p>
           <p class="kpi-label">Challenges Terminés</p>
@@ -41,10 +41,10 @@
   <div class="filter-bar">
     <button class="filter-chip" [class.active]="activeFilter==='ALL'" (click)="filterChallenges('ALL')">Tous</button>
     <button class="filter-chip" [class.active]="activeFilter==='PUBLIC'" (click)="filterChallenges('PUBLIC')">
-      <i class="bi bi-globe2"></i> Publics
+      <span class="material-icons">public</span> Publics
     </button>
     <button class="filter-chip" [class.active]="activeFilter==='PRIVATE'" (click)="filterChallenges('PRIVATE')">
-      <i class="bi bi-lock-fill"></i> Privés
+      <span class="material-icons">lock</span> Privés
     </button>
   </div>
 
@@ -57,12 +57,12 @@
   <!-- ══════════ EMPTY STATE ══════════ -->
   <div class="empty-state" *ngIf="!loading && challenges.length === 0">
     <div class="empty-illustration">
-      <i class="bi bi-trophy"></i>
+      <span class="material-icons">emoji_events</span>
     </div>
     <h3>Aucun challenge pour le moment</h3>
     <p>Inspirez vos membres en créant votre premier défi dès maintenant !</p>
     <button class="btn-primary-cta" (click)="openModal()">
-      <i class="bi bi-plus-lg"></i> Créer mon premier challenge
+      <span class="material-icons">add</span> Créer mon premier challenge
     </button>
   </div>
 
@@ -75,7 +75,7 @@
 
       <div class="card-header-row">
         <span class="type-badge" [class.badge-sport]="c.visibility === 'PUBLIC'" [class.badge-custom]="c.visibility === 'PRIVATE'">
-          <i class="bi" [class.bi-globe2]="c.visibility === 'PUBLIC'" [class.bi-lock-fill]="c.visibility === 'PRIVATE'"></i>
+          <span class="material-icons" style="font-size: 0.9rem;">{{ c.visibility === 'PUBLIC' ? 'public' : 'lock' }}</span>
           {{ c.visibility === 'PUBLIC' ? 'Public' : 'Privé' }}
         </span>
         <div class="card-header-right">
@@ -90,17 +90,17 @@
         <p class="habit-desc">{{ c.description }}</p>
 
         <div class="habit-meta">
-          <span class="meta-chip"><i class="bi bi-calendar3"></i> Du {{ c.startDate | date:'dd MMM' }} au {{ c.endDate | date:'dd MMM yyyy' }}</span>
+          <span class="meta-chip"><span class="material-icons" style="font-size: 0.9rem;">calendar_today</span> Du {{ c.startDate | date:'dd MMM' }} au {{ c.endDate | date:'dd MMM yyyy' }}</span>
         </div>
       </div>
 
       <div class="card-actions">
         <button class="action-btn btn-edit" (click)="openModal(c)" title="Modifier">
-          <i class="bi bi-pencil"></i>
+          <span class="material-icons">edit</span>
           <span>Modifier</span>
         </button>
         <button class="action-btn btn-del" (click)="confirmDelete(c)" title="Supprimer">
-          <i class="bi bi-trash3"></i>
+          <span class="material-icons">delete</span>
         </button>
       </div>
     </div>
@@ -109,14 +109,22 @@
 </section>
 
 <!-- ══════════ CHALLENGE MODAL ══════════ -->
-<div class="modal-overlay" *ngIf="showModal">
-  <div class="modal-sheet">
+<div class="modal-overlay" *ngIf="showModal" (click)="showModal = false">
+  <div class="modal-sheet" (click)="$event.stopPropagation()">
+    
     <div class="modal-head">
       <div class="modal-head-left">
-        <span class="modal-icon"><i class="bi bi-trophy"></i></span>
-        <h3>{{ isEditing ? 'Modifier Challenge' : 'Nouveau Challenge' }}</h3>
+        <span class="modal-icon">
+          <span class="material-icons">emoji_events</span>
+        </span>
+        <div>
+          <h3>{{ isEditing ? 'Modifier Challenge' : 'Nouveau Challenge' }}</h3>
+          <p class="modal-subtitle">Configurez les détails de votre nouveau défi</p>
+        </div>
       </div>
-      <button class="modal-close" (click)="showModal = false"><i class="bi bi-x-lg"></i></button>
+      <button class="modal-close" (click)="showModal = false">
+        <span class="material-icons">close</span>
+      </button>
     </div>
 
     <div class="modal-content">
@@ -126,7 +134,7 @@
       </div>
 
       <div class="field-group">
-        <label class="field-label">Description détaillée</label>
+        <label class="field-label">Description détaillée <span class="optional">(optionnel)</span></label>
         <textarea [(ngModel)]="form.description" class="field-input" rows="4" 
                   placeholder="Expliquez l'objectif et les règles du challenge…"></textarea>
       </div>
@@ -154,19 +162,22 @@
     <div class="modal-foot">
       <button class="btn-ghost" (click)="showModal = false">Annuler</button>
       <button class="btn-primary" (click)="save()" [disabled]="processing">
-        <i class="bi bi-hourglass-split" *ngIf="processing"></i>
-        {{ processing ? 'Enregistrement…' : 'Enregistrer le challenge' }}
+        <span class="material-icons" *ngIf="!processing">save</span>
+        <div class="spinner-xs" *ngIf="processing"></div>
+        <span>{{ processing ? 'Enregistrement…' : 'Enregistrer le challenge' }}</span>
       </button>
     </div>
   </div>
 </div>
 
 <!-- ══════════ DELETE CONFIRM ══════════ -->
-<div class="modal-overlay" *ngIf="showDeleteConfirm">
-  <div class="modal-sheet modal-xs">
+<div class="modal-overlay" *ngIf="showDeleteConfirm" (click)="showDeleteConfirm = false">
+  <div class="modal-sheet modal-xs" (click)="$event.stopPropagation()">
     <div class="modal-head danger-head">
       <div class="modal-head-left">
-        <span class="modal-icon danger-icon"><i class="bi bi-exclamation-triangle-fill"></i></span>
+        <span class="modal-icon danger-icon">
+          <span class="material-icons">report_problem</span>
+        </span>
         <h3>Supprimer le challenge</h3>
       </div>
     </div>
@@ -174,12 +185,16 @@
       <p class="delete-confirm-text">
         Voulez-vous vraiment supprimer <strong>"{{ challengeToDelete?.title }}"</strong> ?
       </p>
-      <p class="delete-warn">Cette action informera les participants si le challenge est actif.</p>
+      <p class="delete-warn">
+        <span class="material-icons" style="font-size: 1rem; vertical-align: middle; margin-right: 4px;">warning</span>
+        Cette action informera les participants si le challenge est actif.
+      </p>
     </div>
     <div class="modal-foot">
       <button class="btn-ghost" (click)="showDeleteConfirm = false">Abandonner</button>
       <button class="btn-danger" (click)="deleteChallenge()">
-        <i class="bi bi-trash3-fill"></i> Confirmer la suppression
+        <span class="material-icons">delete_forever</span>
+        <span>Confirmer la suppression</span>
       </button>
     </div>
   </div>
